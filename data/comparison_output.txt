@@ -1,0 +1,81 @@
+======================================================================
+AIDA — AEIF vs Baseline Pipeline Comparison
+======================================================================
+Loading weights:   0%|          | 0/105 [00:00<?, ?it/s]Loading weights: 100%|██████████| 105/105 [00:00<00:00, 17902.52it/s]
+
+──────────────────────────────────────────────────────────────────────
+Conversation: sadness_sequence
+──────────────────────────────────────────────────────────────────────
+
+  Turn 1: "I failed my exam and feel like giving up"
+  ┌─── AEIF     ─── emotion=SADNESS      trend=INSUFFICIENT_DATA      strategy=VALIDATION
+  │    Response: I'm so sorry to hear that you're feeling this way, and it's completely understandable to feel overwhelmed after a tough ...
+  ├─── Baseline ─── emotion=SADNESS      trend=INSUFFICIENT_DATA      strategy=STANDARD
+  │    Response: I'm so sorry to hear that you're feeling this way, it can be really tough to deal with disappointment. Failing an exam d...
+  └──
+
+  Turn 2: "I've been feeling really down lately"
+  ┌─── AEIF     ─── emotion=SADNESS      trend=INSUFFICIENT_DATA      strategy=VALIDATION
+  │    Response: It can be really tough to feel down for an extended period, and it's completely understandable that you're feeling this ...
+  ├─── Baseline ─── emotion=SADNESS      trend=INSUFFICIENT_DATA      strategy=STANDARD
+  │    Response: It can be really tough to feel down for a while, and it's okay to acknowledge those feelings. Sometimes it helps to talk...
+  └──
+
+  Turn 3: "Nothing seems to interest me anymore"
+  ┌─── AEIF     ─── emotion=SADNESS      trend=PERSISTENT_DISTRESS    strategy=VALIDATION_AND_REFLECTION
+  │    Response: It can be really tough to feel disconnected from the things that usually bring you joy. This feeling of emptiness can be...
+  ├─── Baseline ─── emotion=SADNESS      trend=INSUFFICIENT_DATA      strategy=STANDARD
+  │    Response: It can be really tough to feel disconnected from the things that usually bring you joy. Sometimes this can be a sign tha...
+  └──
+
+──────────────────────────────────────────────────────────────────────
+Conversation: anxiety_sequence
+──────────────────────────────────────────────────────────────────────
+
+  Turn 1: "I'm really anxious about my exam next week"
+  ┌─── AEIF     ─── emotion=ANXIETY      trend=INSUFFICIENT_DATA      strategy=GROUNDING
+  │    Response: It can be really overwhelming to feel anxious about an upcoming exam. Let's take a moment to breathe together - why don'...
+  ├─── Baseline ─── emotion=ANXIETY      trend=INSUFFICIENT_DATA      strategy=STANDARD
+  │    Response: It's completely understandable to feel anxious about a big exam, and it sounds like you're putting a lot of pressure on ...
+  └──
+
+  Turn 2: "What if I fail and disappoint everyone?"
+  ┌─── AEIF     ─── emotion=SADNESS      trend=INSUFFICIENT_DATA      strategy=VALIDATION
+  │    Response: It can be really tough to feel like you're carrying the weight of others' expectations on your shoulders. It sounds like...
+  ├─── Baseline ─── emotion=SADNESS      trend=INSUFFICIENT_DATA      strategy=STANDARD
+  │    Response: It can be really tough to feel like you're carrying the weight of others' expectations on your shoulders. Remember that ...
+  └──
+
+  Turn 3: "I can't stop worrying about it"
+  ┌─── AEIF     ─── emotion=ANXIETY      trend=FLUCTUATING            strategy=EXPLORATORY_INQUIRY
+  │    Response: It can be really frustrating when worries feel like they're stuck on repeat. I'm here to listen and try to understand wh...
+  ├─── Baseline ─── emotion=ANXIETY      trend=INSUFFICIENT_DATA      strategy=STANDARD
+  │    Response: It can be really overwhelming when worries feel like they're spinning out of control. Sometimes, taking a step back and ...
+  └──
+
+──────────────────────────────────────────────────────────────────────
+Conversation: mixed_sequence
+──────────────────────────────────────────────────────────────────────
+
+  Turn 1: "I got the job but I'm terrified I'll mess it up"
+  ┌─── AEIF     ─── emotion=ANXIETY      trend=INSUFFICIENT_DATA      strategy=GROUNDING
+  │    Response: It's completely normal to feel a bit overwhelmed when starting something new. Let's take a deep breath together and focu...
+  ├─── Baseline ─── emotion=ANXIETY      trend=INSUFFICIENT_DATA      strategy=STANDARD
+  │    Response: That can be a really overwhelming feeling, especially when you've been working towards this goal for so long. It's norma...
+  └──
+
+  Turn 2: "Everyone says I should be happy"
+  ┌─── AEIF     ─── emotion=POSITIVE     trend=INSUFFICIENT_DATA      strategy=POSITIVE_REINFORCEMENT
+  │    Response: It's great that you're surrounded by supportive people who want the best for you. Their encouragement can be really upli...
+  ├─── Baseline ─── emotion=POSITIVE     trend=INSUFFICIENT_DATA      strategy=STANDARD
+  │    Response: It can be really tough when others don't quite understand why you're feeling a certain way, even if it's not what they e...
+  └──
+
+  Turn 3: "I'm starting to feel like myself again"
+  ┌─── AEIF     ─── emotion=POSITIVE     trend=STABLE_POSITIVE        strategy=POSITIVE_REINFORCEMENT
+  │    Response: That's wonderful to hear, it's like a weight is lifting off your shoulders. You're rediscovering your own rhythm and ene...
+  ├─── Baseline ─── emotion=POSITIVE     trend=INSUFFICIENT_DATA      strategy=STANDARD
+  │    Response: It's wonderful to hear that you're regaining your sense of self and feeling more grounded. This can be a really empoweri...
+  └──
+
+Detailed comparison written to data/pipeline_comparison.json

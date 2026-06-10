@@ -4,6 +4,9 @@ Runs the same conversation through both pipeline modes
 and compares the outputs for analysis (Chapter 4 evaluation).
 """
 
+from dotenv import load_dotenv
+load_dotenv()
+
 import json
 import sys
 import os

@@ -70,6 +70,10 @@ KEYWORD_CLUSTER_MAP = {
         "care deeply", "mean the world", "best day", "so happy",
         "delight", "cheerful", "good news",
         "God dey", "everything go dey alright",
+        "helped", "better", "feel better", "helped a little", "feel good",
+        "not alone", "someone to talk", "needed to talk", "thank you",
+        "relieved", "appreciate", "that helped", "feeling better",
+        "starting to", "little better", "bit better",
     ],
     "SADNESS": [
         "sad", "depress", "down", "unhappy", "lonely", "miserable", "cry",
@@ -78,6 +82,8 @@ KEYWORD_CLUSTER_MAP = {
         "miss", "giving up", "feel like giving up", "nobody understands",
         "going through", "fail", "failed", "moved away",
         "life no balance", "nobody dey for me", "my heart dey pain",
+        "worthless", "tired of trying", "let everyone down",
+        "letting people down", "not enough",
     ],
     "ANXIETY": [
         "anxious", "anxiety", "fear", "scared", "afraid", "worried", "worry",

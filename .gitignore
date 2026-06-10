@@ -1,0 +1,16 @@
+frontend/node_modules/
+frontend/dist/
+backend/.env
+backend/__pycache__/
+backend/.pytest_cache/
+backend/tests/__pycache__/
+backend/emotion/__pycache__/
+backend/feedback/__pycache__/
+backend/llm/__pycache__/
+backend/memory/__pycache__/
+backend/safety/__pycache__/
+backend/strategy/__pycache__/
+backend/trend/__pycache__/
+*.pyc
+.~lock.*
+.DS_Store

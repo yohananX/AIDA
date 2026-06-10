@@ -4,6 +4,9 @@ Sends a sequence of messages to the /chat endpoint and prints responses.
 Used to generate Chapter 4 screenshots.
 """
 
+from dotenv import load_dotenv
+load_dotenv()
+
 import time
 import json
 import sys

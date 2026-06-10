@@ -1,0 +1,74 @@
+======================================================================
+  AIDA — Multi-Turn Demo Conversation
+======================================================================
+
+  Turn 1
+  User:            I have been feeling really down lately. Nothing seems to go right.
+  Emotion:         SADNESS (sadness, 98%)
+  Trend:           INSUFFICIENT_DATA
+  Strategy:        VALIDATION
+  Crisis Flag:     false
+  AIDA Response:   I'm so sorry to hear that you're feeling down, and it sounds like things have been really tough for you lately. It can be really overwhelming when everything seems to be going wrong. I'm here to listen and offer support, and I care about what you're going through. What's been the hardest part for you to deal with recently?
+  -------------------------------------------------------------------
+
+  Turn 2
+  User:            I failed my final year project presentation today. I let everyone down.
+  Emotion:         SADNESS (sadness, 85%)
+  Trend:           INSUFFICIENT_DATA
+  Strategy:        VALIDATION
+  Crisis Flag:     false
+  AIDA Response:   I can sense how disappointed and hurt you must be feeling right now, and it's completely understandable to feel that way after such a significant setback. It takes a lot of courage to acknowledge the pain of letting others down, and I'm here to listen without judgment. Your feelings are valid, and it's okay to feel sad and overwhelmed. What are some of the thoughts that have been going through your mind since the presentation?
+  -------------------------------------------------------------------
+
+  Turn 3
+  User:            My supervisor was disappointed. I could see it on his face.
+  Emotion:         ANGER (disgust, 49%)
+  Trend:           PERSISTENT_DISTRESS
+  Strategy:        VALIDATION_AND_REFLECTION
+  Crisis Flag:     false
+  AIDA Response:   It sounds like seeing your supervisor's disappointment was really tough for you to handle, and it's understandable that it would stir up strong emotions. You must be feeling a mix of frustration, anger, and maybe even a bit of shame. It can be really painful to feel like we've let someone down, especially someone we respect or look up to. What's going through your mind when you think about your supervisor's reaction?
+  -------------------------------------------------------------------
+
+  Turn 4
+  User:            I just feel so worthless and tired of trying.
+  Emotion:         SADNESS (sadness, 98%)
+  Trend:           FLUCTUATING
+  Strategy:        EXPLORATORY_INQUIRY
+  Crisis Flag:     false
+  AIDA Response:   It can be really draining to feel like our efforts aren't paying off, and it's understandable that you'd feel that way, especially after a tough experience like your presentation. It sounds like you're feeling a bit lost and unsure about what to do next. You're not alone in feeling this way, and it's okay to take a step back and reassess things. What would you say is the one thing that's been weighing on your mind the most lately?
+  -------------------------------------------------------------------
+
+  Turn 5
+  User:            I don't know. Maybe things can get better. I'm not sure.
+  Emotion:         NEUTRAL (neutral, 76%)
+  Trend:           FLUCTUATING
+  Strategy:        EXPLORATORY_INQUIRY
+  Crisis Flag:     false
+  AIDA Response:   It can be really helpful to hold onto the idea that things can improve, even when it's hard to see right now. Sometimes, just taking things one step at a time can make a big difference. You've already shown a lot of courage by facing your challenges and being honest about how you're feeling. What small step could you take today to start moving forward?
+  -------------------------------------------------------------------
+
+  Turn 6
+  User:            Actually, my friend just called me and it helped a little.
+  Emotion:         NEUTRAL (neutral, 73%)
+  Trend:           FLUCTUATING
+  Strategy:        EXPLORATORY_INQUIRY
+  Crisis Flag:     false
+  AIDA Response:   It's great that your friend reached out and was able to offer some support. Sometimes, just talking to someone who cares about us can make a big difference in how we're feeling. What did you talk about with your friend that helped you feel a little better?
+  -------------------------------------------------------------------
+
+  Turn 7
+  User:            I think I just needed to talk to someone.
+  Emotion:         NEUTRAL (neutral, 88%)
+  Trend:           FLUCTUATING
+  Strategy:        EXPLORATORY_INQUIRY
+  Crisis Flag:     false
+  AIDA Response:   It can be really helpful to share our thoughts and feelings with someone who can listen and offer support. Sometimes just having someone to talk to can help us feel a bit more grounded and less alone. What is it about talking to your friend that made you feel a little better today?
+  -------------------------------------------------------------------
+
+======================================================================
+  Session Summary
+======================================================================
+  Dominant Emotion: SADNESS
+  Final Trend:      FLUCTUATING
+  Turn Count:       14
+======================================================================

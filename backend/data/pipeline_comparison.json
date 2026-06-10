@@ -1,0 +1,164 @@
+{
+  "sadness_sequence": {
+    "aeif": [
+      {
+        "message": "I failed my exam and feel like giving up",
+        "emotion_cluster": "SADNESS",
+        "trend": "INSUFFICIENT_DATA",
+        "strategy": "VALIDATION",
+        "response": "I'm so sorry to hear that you're feeling this way, and it's completely understandable to feel overwhelmed after a tough experience like that. Failing an exam can be really disappointing, and it's normal to feel like giving up when things don't go as planned. You're not alone in feeling this way, and I'm here to listen and offer support. What's been going through your mind since you found out about the exam results?",
+        "confidence": 0.9814
+      },
+      {
+        "message": "I've been feeling really down lately",
+        "emotion_cluster": "SADNESS",
+        "trend": "INSUFFICIENT_DATA",
+        "strategy": "VALIDATION",
+        "response": "It can be really tough to feel down for an extended period, and it's completely understandable that you're feeling this way, especially after a disappointing experience like failing an exam. I'm here to listen and offer support, and I want you to know that I care about how you're feeling. It takes a lot of courage to acknowledge and share your emotions, so thank you for being open with me. What's been the most challenging part of your day lately?",
+        "confidence": 0.9878
+      },
+      {
+        "message": "Nothing seems to interest me anymore",
+        "emotion_cluster": "SADNESS",
+        "trend": "PERSISTENT_DISTRESS",
+        "strategy": "VALIDATION_AND_REFLECTION",
+        "response": "It can be really tough to feel disconnected from the things that usually bring you joy. This feeling of emptiness can be especially hard to navigate when it feels like nothing is sparking your interest. I'm here to listen and support you as you work through these feelings. What's one thing that you used to enjoy doing, even if it doesn't feel appealing right now?",
+        "confidence": 0.7945
+      }
+    ],
+    "baseline": [
+      {
+        "message": "I failed my exam and feel like giving up",
+        "emotion_cluster": "SADNESS",
+        "trend": "INSUFFICIENT_DATA",
+        "strategy": "STANDARD",
+        "response": "I'm so sorry to hear that you're feeling this way, it can be really tough to deal with disappointment. Failing an exam doesn't define your worth or abilities, and many people have been in your shoes before. It's okay to feel upset, and it's normal to need some time to process your emotions. What's been going through your mind since you found out about your exam results?",
+        "confidence": 0.9814
+      },
+      {
+        "message": "I've been feeling really down lately",
+        "emotion_cluster": "SADNESS",
+        "trend": "INSUFFICIENT_DATA",
+        "strategy": "STANDARD",
+        "response": "It can be really tough to feel down for a while, and it's okay to acknowledge those feelings. Sometimes it helps to talk about what's been on your mind and in your heart. It sounds like you're carrying a heavy emotional load, and I'm here to listen. What's one thing that's been weighing on your mind lately?",
+        "confidence": 0.9878
+      },
+      {
+        "message": "Nothing seems to interest me anymore",
+        "emotion_cluster": "SADNESS",
+        "trend": "INSUFFICIENT_DATA",
+        "strategy": "STANDARD",
+        "response": "It can be really tough to feel disconnected from the things that usually bring you joy. Sometimes this can be a sign that you're just feeling a bit drained or overwhelmed. It might be helpful to take some time to reflect on what's changed and what you might need to feel more engaged again. What's one thing you used to enjoy that you haven't tried in a while?",
+        "confidence": 0.7945
+      }
+    ]
+  },
+  "anxiety_sequence": {
+    "aeif": [
+      {
+        "message": "I'm really anxious about my exam next week",
+        "emotion_cluster": "ANXIETY",
+        "trend": "INSUFFICIENT_DATA",
+        "strategy": "GROUNDING",
+        "response": "It can be really overwhelming to feel anxious about an upcoming exam. Let's take a moment to breathe together - why don't you take a deep breath in, hold it for a second, and then slowly let it out? Sometimes, focusing on our breath can help calm our minds. What's the first thing that comes to mind when you think about what you're looking forward to doing after the exam is over?",
+        "confidence": 0.9936
+      },
+      {
+        "message": "What if I fail and disappoint everyone?",
+        "emotion_cluster": "SADNESS",
+        "trend": "INSUFFICIENT_DATA",
+        "strategy": "VALIDATION",
+        "response": "It can be really tough to feel like you're carrying the weight of others' expectations on your shoulders. It sounds like the fear of disappointing others is adding to your sadness right now. I'm here to listen and support you, without judgment. What does \"disappointing everyone\" mean to you, and how is that feeling sitting with you today?",
+        "confidence": 0.3909
+      },
+      {
+        "message": "I can't stop worrying about it",
+        "emotion_cluster": "ANXIETY",
+        "trend": "FLUCTUATING",
+        "strategy": "EXPLORATORY_INQUIRY",
+        "response": "It can be really frustrating when worries feel like they're stuck on repeat. I'm here to listen and try to understand what's going on for you. It sounds like this exam is weighing heavily on your mind, and it's hard to shake off the worrying thoughts. What's one specific aspect of the exam that's causing you the most worry right now?",
+        "confidence": 0.9177
+      }
+    ],
+    "baseline": [
+      {
+        "message": "I'm really anxious about my exam next week",
+        "emotion_cluster": "ANXIETY",
+        "trend": "INSUFFICIENT_DATA",
+        "strategy": "STANDARD",
+        "response": "It's completely understandable to feel anxious about a big exam, and it sounds like you're putting a lot of pressure on yourself. I'm here to listen and offer support, and I want you to know that you're not alone in feeling this way. Many people get nervous before a big test, and it doesn't mean you're not prepared. What's been going through your mind when you think about the exam?",
+        "confidence": 0.9936
+      },
+      {
+        "message": "What if I fail and disappoint everyone?",
+        "emotion_cluster": "SADNESS",
+        "trend": "INSUFFICIENT_DATA",
+        "strategy": "STANDARD",
+        "response": "It can be really tough to feel like you're carrying the weight of others' expectations on your shoulders. Remember that it's okay to make mistakes and that you're not defined by one exam result. It might be helpful to think about what you would say to a friend in a similar situation - would you be kind and understanding, or critical and harsh? What would you need to hear from someone right now to feel a little more at ease?",
+        "confidence": 0.3909
+      },
+      {
+        "message": "I can't stop worrying about it",
+        "emotion_cluster": "ANXIETY",
+        "trend": "INSUFFICIENT_DATA",
+        "strategy": "STANDARD",
+        "response": "It can be really overwhelming when worries feel like they're spinning out of control. Sometimes, taking a step back and focusing on the present moment can help calm things down. You're doing the best you can, and that's something to be proud of. What's one thing you could do right now to take care of yourself and feel a little more grounded?",
+        "confidence": 0.9177
+      }
+    ]
+  },
+  "mixed_sequence": {
+    "aeif": [
+      {
+        "message": "I got the job but I'm terrified I'll mess it up",
+        "emotion_cluster": "ANXIETY",
+        "trend": "INSUFFICIENT_DATA",
+        "strategy": "GROUNDING",
+        "response": "It's completely normal to feel a bit overwhelmed when starting something new. Let's take a deep breath together and focus on the present moment - why don't we take a look around you and notice 5 things that you can see right now? This can help calm your mind and bring you back to the here and now. What's the first thing you notice when you look around?",
+        "confidence": 0.9933
+      },
+      {
+        "message": "Everyone says I should be happy",
+        "emotion_cluster": "POSITIVE",
+        "trend": "INSUFFICIENT_DATA",
+        "strategy": "POSITIVE_REINFORCEMENT",
+        "response": "It's great that you're surrounded by supportive people who want the best for you. Their encouragement can be really uplifting, and it's wonderful that they're acknowledging your achievement. You must be feeling quite proud of yourself for getting the job, and that's something to celebrate. What is it about their support that's making you feel happy right now?",
+        "confidence": 0.9502
+      },
+      {
+        "message": "I'm starting to feel like myself again",
+        "emotion_cluster": "POSITIVE",
+        "trend": "STABLE_POSITIVE",
+        "strategy": "POSITIVE_REINFORCEMENT",
+        "response": "That's wonderful to hear, it's like a weight is lifting off your shoulders. You're rediscovering your own rhythm and energy, and that's something to be cherished. It's great that you're acknowledging and embracing this positive shift within yourself. What are some of the things that you're enjoying or looking forward to now that you're feeling more like yourself?",
+        "confidence": 0.7261
+      }
+    ],
+    "baseline": [
+      {
+        "message": "I got the job but I'm terrified I'll mess it up",
+        "emotion_cluster": "ANXIETY",
+        "trend": "INSUFFICIENT_DATA",
+        "strategy": "STANDARD",
+        "response": "That can be a really overwhelming feeling, especially when you've been working towards this goal for so long. It's normal to have some doubts and fears about your abilities. You've already achieved something amazing by getting the job, and that takes a lot of skill and dedication. What are some things that are worrying you the most about this new role?",
+        "confidence": 0.9933
+      },
+      {
+        "message": "Everyone says I should be happy",
+        "emotion_cluster": "POSITIVE",
+        "trend": "INSUFFICIENT_DATA",
+        "strategy": "STANDARD",
+        "response": "It can be really tough when others don't quite understand why you're feeling a certain way, even if it's not what they expect. You might be feeling a mix of emotions, and that's okay - it's normal to have conflicting feelings, especially with something as significant as a new job. It's like there's a gap between what others think you should be feeling and what you're actually experiencing. What would you say is the most overwhelming emotion for you right now?",
+        "confidence": 0.9502
+      },
+      {
+        "message": "I'm starting to feel like myself again",
+        "emotion_cluster": "POSITIVE",
+        "trend": "INSUFFICIENT_DATA",
+        "strategy": "STANDARD",
+        "response": "It's wonderful to hear that you're regaining your sense of self and feeling more grounded. This can be a really empowering experience, especially after navigating uncertain emotions. What small steps have you taken recently that you think might be contributing to this positive shift? What does feeling like yourself again mean to you right now?",
+        "confidence": 0.7261
+      }
+    ]
+  }
+}
