@@ -1,50 +1,42 @@
 import React from 'react';
 
 const DOT_COLORS = {
-  POSITIVE: '#5BAD7A',
-  SADNESS: '#4682B4',
-  ANXIETY: '#C8963C',
-  ANGER: '#B44646',
-  NEUTRAL: '#8A94A0',
-  AMBIGUOUS: '#7864A0',
+  POSITIVE: '#4edea3',
+  SADNESS: '#7cb9e8',
+  ANXIETY: '#ffb869',
+  ANGER: '#ff8a80',
+  NEUTRAL: '#9e94a8',
+  AMBIGUOUS: '#c8b8ff',
 };
 
-const DOT_LABELS = {
-  POSITIVE: 'Positive',
-  SADNESS: 'Sadness',
-  ANXIETY: 'Anxiety',
-  ANGER: 'Anger',
-  NEUTRAL: 'Neutral',
-  AMBIGUOUS: 'Ambiguous',
-};
+const MAX_BARS = 7;
 
 export default function TrendTimeline({ history = [] }) {
-  const dots = history.slice(-10);
-  if (dots.length === 0) return null;
+  const slice = history.slice(-MAX_BARS);
+  const hasData = slice.length > 0;
 
   return (
-    <div className="trend-timeline">
-      <div className="timeline-label">Emotional journey</div>
-      <div className="timeline-track">
-        {dots.map((emotion, i) => (
+    <>{hasData && (
+      <div className="flex items-center gap-1 flex-wrap">
+        {slice.map((emotion, i) => (
           <div
             key={i}
-            className="timeline-dot-wrap"
-            title={`${DOT_LABELS[emotion] || emotion} (turn ${i + 1})`}
-          >
-            <div
-              className={`timeline-dot ${i === dots.length - 1 ? 'current' : ''}`}
-              style={{ background: DOT_COLORS[emotion] || '#8A94A0' }}
-            />
-            {i < dots.length - 1 && (
-              <div
-                className="timeline-connector"
-                style={{ background: DOT_COLORS[emotion] || '#8A94A0' }}
-              />
-            )}
-          </div>
+            className={`w-2 h-2 rounded-full transition-transform duration-200 ${
+              i === slice.length - 1 ? 'ring-1 ring-white/40 scale-125' : ''
+            }`}
+            style={{ background: DOT_COLORS[emotion] || '#9e94a8' }}
+            title={`${emotion} (turn ${i + 1})`}
+          />
         ))}
       </div>
-    </div>
+    )}
+    {!hasData && (
+      <div className="flex items-center gap-1">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="w-2 h-2 rounded-full bg-white/10" />
+        ))}
+      </div>
+    )}
+    </>
   );
 }

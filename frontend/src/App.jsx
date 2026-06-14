@@ -5,37 +5,37 @@ import TrendTimeline from './components/TrendTimeline.jsx';
 import StrategyBadge from './components/StrategyBadge.jsx';
 import FeedbackStars from './components/FeedbackStars.jsx';
 import SessionSummary from './components/SessionSummary.jsx';
+import ResearcherView from './components/ResearcherView.jsx';
 import { sendMessage, clearSession, getSession } from './api/aida.js';
 
 const CLUSTER_META = {
-  POSITIVE:  { label: 'Positive',  color: '#5BAD7A', bar: '#5BAD7A' },
-  SADNESS:   { label: 'Sadness',   color: '#4682B4', bar: '#4682B4' },
-  ANXIETY:   { label: 'Anxiety',   color: '#C8963C', bar: '#C8963C' },
-  ANGER:     { label: 'Anger',     color: '#B44646', bar: '#B44646' },
-  NEUTRAL:   { label: 'Neutral',   color: '#8A94A0', bar: '#8A94A0' },
-  AMBIGUOUS: { label: 'Ambiguous', color: '#7864A0', bar: '#7864A0' },
-  CRISIS:    { label: 'Crisis',    color: '#B05050', bar: '#B05050' },
+  POSITIVE:  { label: 'Positive',  color: '#4edea3', bar: '#4edea3' },
+  SADNESS:   { label: 'Sadness',   color: '#7cb9e8', bar: '#7cb9e8' },
+  ANXIETY:   { label: 'Anxiety',   color: '#ffb869', bar: '#ffb869' },
+  ANGER:     { label: 'Anger',     color: '#ff8a80', bar: '#ff8a80' },
+  NEUTRAL:   { label: 'Neutral',   color: '#9e94a8', bar: '#9e94a8' },
+  AMBIGUOUS: { label: 'Ambiguous', color: '#c8b8ff', bar: '#c8b8ff' },
+  CRISIS:    { label: 'Crisis',    color: '#ff7b7b', bar: '#ff7b7b' },
 };
 
-const SUGGESTIONS = [
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const SUGGESTIONS = shuffle([
   "I've been feeling overwhelmed lately",
   "I'm not sure how I feel today",
   "Something good happened and I want to share it",
   "I need someone to talk to",
-];
+]);
 
 function timeStr() {
   return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-
-function EmotionTag({ emotion, confidence }) {
-  const meta = CLUSTER_META[emotion] || CLUSTER_META.NEUTRAL;
-  return (
-    <span className="emotion-tag" style={{ color: meta.color, background: meta.color + '15' }}>
-      <span className="emotion-dot" style={{ background: meta.color }} />
-      {meta.label}{confidence ? ` · ${Math.round(confidence * 100)}%` : ''}
-    </span>
-  );
 }
 
 export default function App() {
@@ -49,6 +49,8 @@ export default function App() {
   const [emotionHistory, setEmotionHistory] = useState([]);
   const [showSummary, setShowSummary] = useState(false);
   const [sessionData, setSessionData] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [lowConfidenceTurns, setLowConfidenceTurns] = useState([]);
   const sessionIdRef = useRef(Math.random().toString(36).slice(2, 10));
   const bottomRef = useRef(null);
   const textareaRef = useRef(null);
@@ -89,9 +91,14 @@ export default function App() {
         crisis: result.crisis_flag,
         strategy: result.strategy,
         turn: result.turn_number,
+        mode: result.mode || 'aeif',
+        low_confidence: result.low_confidence || false,
         time: timeStr(),
         id: Date.now() + 1,
       }]);
+      if (result.low_confidence && result.turn_number) {
+        setLowConfidenceTurns(prev => [...prev, result.turn_number]);
+      }
     } catch {
       setMessages(prev => [...prev, {
         role: 'assistant',
@@ -137,16 +144,33 @@ export default function App() {
     setEmotionHistory([]);
     setShowSummary(false);
     setSessionData(null);
+    setLowConfidenceTurns([]);
     turnRef.current = 0;
   };
 
+  const handleConsentGiven = async () => {
+    try {
+      await fetch('http://localhost:8000/data/consent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId }),
+      });
+    } catch (e) {
+      console.error('Consent save failed:', e);
+    }
+    newSession();
+  };
+
+  const handleConsentDeclined = () => {
+    newSession();
+  };
+
+  if (window.location.hash === '#researcher') {
+    return <ResearcherView />;
+  }
+
   if (!accepted) {
-    return (
-      <>
-        <style>{styles}</style>
-        <DisclaimerScreen onAccept={() => setAccepted(true)} />
-      </>
-    );
+    return <DisclaimerScreen onAccept={() => setAccepted(true)} />;
   }
 
   const totalEmotions = messages.filter(m => m.role === 'assistant' && m.emotion && m.emotion !== 'CRISIS').length;
@@ -157,79 +181,141 @@ export default function App() {
 
   return (
     <>
-      <style>{styles}</style>
       <EmotionPulse emotionCluster={currentEmotion} />
-      <div className="app">
-        <aside className="sidebar">
-          <div className="sidebar-logo">AIDA</div>
-          <div className="sidebar-tagline">
-            Affective Intelligent Dialogue Agent
+
+      <div className="fixed top-[-20%] left-[-20%] w-[80vw] h-[80vw] aura-primary pointer-events-none z-0" />
+      <div className="fixed bottom-[-20%] right-[-20%] w-[80vw] h-[80vw] aura-secondary pointer-events-none z-0" />
+
+      <header className="fixed top-0 left-0 right-0 z-50 h-14 md:h-16 flex items-center justify-between px-4 md:px-6 bg-background/80 backdrop-blur-xl border-b border-outline-variant/10">
+        <div className="flex items-center gap-3">
+          <button onClick={() => setDrawerOpen(d => !d)}
+            className="flex items-center justify-center w-10 h-10 rounded-full text-on-surface-variant hover:bg-white/5 transition-colors">
+            <span className="material-symbols-outlined">menu</span>
+          </button>
+          <span className="material-symbols-outlined text-primary text-2xl md:text-3xl">bubble_chart</span>
+          <h1 className="text-lg md:text-xl font-bold text-primary tracking-tight">AIDA</h1>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container-low border border-outline-variant/20">
+            <div className="w-2 h-2 rounded-full bg-secondary emotion-pulse" />
+            <span className="text-xs text-on-surface-variant">
+              {currentStrategy ? 'Listening' : 'Ready'}
+            </span>
+          </div>
+          <button className="flex items-center justify-center w-10 h-10 rounded-full text-on-surface-variant hover:bg-white/5 transition-colors">
+            <span className="material-symbols-outlined">settings</span>
+          </button>
+        </div>
+      </header>
+
+      {drawerOpen && (
+        <div className="md:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={() => setDrawerOpen(false)} />
+      )}
+
+      <div className="flex h-screen pt-14 md:pt-16 relative z-10">
+
+        <aside className={`
+          fixed md:static inset-y-0 left-0 z-50 md:z-auto
+          ${drawerOpen ? 'translate-x-0' : '-translate-x-full'}
+          md:translate-x-0
+          ${drawerOpen ? '' : 'md:hidden'}
+          transform transition-transform duration-300 ease-in-out
+          flex flex-col w-72 md:w-64 lg:w-72 shrink-0 h-full
+          bg-background/95 backdrop-blur-xl md:bg-background/50
+          border-r border-outline-variant/20
+          p-4 md:p-5 overflow-y-auto gap-5
+        `}>
+
+          <div className="glass-card rounded-lg p-stack-md flex flex-col gap-stack-md shadow-xl">
+            <div className="flex items-center gap-stack-md w-full">
+              <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-primary/30 bg-primary/10 flex items-center justify-center text-2xl">
+                🌿
+              </div>
+              <div className="flex flex-col">
+                <span className="text-headline-md text-primary font-semibold">AIDA</span>
+                <span className="text-body-md text-on-surface-variant opacity-70">Session active</span>
+              </div>
+            </div>
+            <div className="w-full h-px bg-outline-variant/20" />
+            <div className="flex items-center justify-between w-full">
+              <span className="text-label-caps text-on-surface-variant uppercase">Current feeling</span>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: CLUSTER_META[currentEmotion]?.color || '#9e94a8' }} />
+                <span className="text-label-caps text-on-surface">{CLUSTER_META[currentEmotion]?.label || 'Neutral'}</span>
+              </div>
+            </div>
+            <div className="w-full h-px bg-outline-variant/20" />
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <span className="text-label-caps text-on-surface-variant uppercase">Trend</span>
+                {currentTrend && (
+                  <span className="text-[11px] text-on-surface-variant/80 italic">{currentTrend.replace(/_/g, ' ')}</span>
+                )}
+              </div>
+              <TrendTimeline history={emotionHistory} />
+            </div>
           </div>
 
           <StrategyBadge strategy={currentStrategy} />
 
-          <div className="sidebar-divider" />
-
-          <div className="sidebar-label">This session</div>
-          <div className="sidebar-stats">
-            {Object.entries(CLUSTER_META).map(([key, meta]) => {
-              const count = emotionCounts[key] || 0;
-              const pct = totalEmotions > 0 ? (count / totalEmotions) * 100 : 0;
-              return (
-                <div key={key}>
-                  <div className="stat-row">
-                    <span className="stat-dot" style={{ background: meta.color }} />
-                    <span className="stat-name">{meta.label}</span>
-                    <span className="stat-count">{count}</span>
-                  </div>
-                  {totalEmotions > 0 && (
-                    <div className="stat-bar-wrap">
-                      <div className="stat-bar" style={{ width: pct + '%', background: meta.bar }} />
+          <div className="flex flex-col gap-1">
+            <div className="text-label-caps text-on-surface-variant uppercase mb-2">This session</div>
+            <div className="flex flex-col gap-1.5">
+              {Object.entries(CLUSTER_META).map(([key, meta]) => {
+                const count = emotionCounts[key] || 0;
+                const pct = totalEmotions > 0 ? (count / totalEmotions) * 100 : 0;
+                return (
+                  <div key={key}>
+                    <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-white/5 transition-colors">
+                      <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: meta.color }} />
+                      <span className="text-xs text-on-surface-variant flex-1">{meta.label}</span>
+                      <span className="text-xs font-medium text-on-surface tabular-nums">{count}</span>
                     </div>
-                  )}
-                </div>
-              );
-            })}
+                    {totalEmotions > 0 && (
+                      <div className="w-full h-[3px] bg-white/5 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full transition-all duration-500" style={{ width: pct + '%', background: meta.bar }} />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
-          <TrendTimeline history={emotionHistory} />
-
-          <div className="sidebar-divider" />
-          <button className="btn-secondary" onClick={endSession} disabled={messages.length === 0}>
-            ☶ &nbsp; End session
-          </button>
-          <button className="btn-secondary" onClick={newSession}>
-            ↺ &nbsp; New conversation
-          </button>
-          <div className="sidebar-footer">
-            This conversation is private and not stored after the session ends.
-          </div>
+          <nav className="flex flex-col gap-1 mt-auto">
+            <button onClick={endSession} disabled={messages.length === 0}
+              className="flex items-center gap-stack-md p-3 rounded-full bg-secondary-container text-on-secondary-container transition-transform duration-300 hover:scale-[1.02] disabled:opacity-40 disabled:cursor-not-allowed">
+              <span className="material-symbols-outlined">check_circle</span>
+              <span className="text-body-md">End session</span>
+            </button>
+            <button onClick={newSession}
+              className="flex items-center gap-stack-md p-3 rounded-full text-on-surface-variant hover:bg-white/5 transition-colors">
+              <span className="material-symbols-outlined">add_circle</span>
+              <span className="text-body-md">New conversation</span>
+            </button>
+            <div className="text-[11px] text-on-surface-variant/50 leading-relaxed px-3 pt-2">
+              This conversation is private and not stored after the session ends.
+            </div>
+          </nav>
         </aside>
 
-        <main className="chat-main">
-          <header className="chat-header">
-            <div className="header-avatar">🌿</div>
-            <div>
-              <div className="header-name">AIDA</div>
-              <div className="header-status">
-                <span className="header-online" />
-                {currentStrategy ? 'Listening' : 'Ready'}
-              </div>
-            </div>
-          </header>
+        <section className="flex-1 flex flex-col h-full overflow-hidden">
 
-          <div className="messages-wrap">
+          <div className="flex-1 overflow-y-auto px-4 md:px-6 lg:px-8 py-4 md:py-6 flex flex-col gap-4">
             {messages.length === 0 && !loading ? (
-              <div className="welcome-state">
-                <div className="welcome-icon">🌿</div>
-                <div className="welcome-title">How are you feeling today?</div>
-                <p className="welcome-body">
+              <div className="flex-1 flex flex-col items-center justify-center text-center gap-4 px-4">
+                <div className="text-3xl md:text-[40px] bg-primary/5 w-16 h-16 md:w-[72px] md:h-[72px] rounded-full flex items-center justify-center mb-2 backdrop-blur border border-white/10">
+                  🌿
+                </div>
+                <div className="text-xl md:text-2xl font-semibold text-on-surface">How are you feeling today?</div>
+                <p className="text-xs md:text-sm max-w-[280px] md:max-w-[320px] leading-relaxed text-on-surface-variant">
                   This is a quiet space. Take your time — there is no rush.
                   You can start with whatever is on your mind.
                 </p>
-                <div className="welcome-suggestions">
+                <div className="flex flex-col gap-2 mt-2">
                   {SUGGESTIONS.map((s, i) => (
-                    <button key={i} className="suggestion-chip" onClick={() => chat(s)}>
+                    <button key={i} onClick={() => chat(s)}
+                      className="glass-card border border-white/10 backdrop-blur rounded-full px-3 md:px-[18px] py-1.5 md:py-2 text-xs md:text-sm text-on-surface-variant cursor-pointer transition-all hover:bg-primary/10 hover:border-primary/30 hover:text-on-surface hover:-translate-y-0.5 font-sans">
                       {s}
                     </button>
                   ))}
@@ -238,27 +324,35 @@ export default function App() {
             ) : (
               <>
                 {messages.map(msg => (
-                  <div key={msg.id} className={'message-group ' + msg.role}>
-                    <div className={'message-bubble' + (msg.crisis ? ' crisis' : '')}>
-                      {msg.text}
+                  <div key={msg.id} className={`flex flex-col gap-1 ${msg.role === 'user' ? 'items-end' : 'items-start'} animate-[slideUp_0.3s_ease]`}>
+
+                    <div className={`springy-bubble max-w-[92%] md:max-w-[85%] p-3 md:p-stack-md shadow-lg ${msg.role === 'user'
+                      ? 'bg-primary-container text-on-primary-container rounded-2xl rounded-tr-none'
+                      : msg.crisis
+                        ? 'glass-card rounded-2xl rounded-tl-none border-l-2 border-l-[#ff7b7b]'
+                        : 'glass-card rounded-2xl rounded-tl-none border-l-2 shadow-lg'
+                    }`}
+                      style={msg.role === 'assistant' && !msg.crisis && msg.emotion
+                        ? { borderLeftColor: (CLUSTER_META[msg.emotion] || CLUSTER_META.NEUTRAL).color }
+                        : undefined}
+                    >
+                      <p className="text-body-md leading-relaxed text-on-surface">{msg.text}</p>
                     </div>
-                    {msg.role === 'assistant' && msg.emotion && (
-                      <div className="message-meta">
-                        <EmotionTag emotion={msg.emotion} confidence={msg.confidence} />
-                        {!msg.crisis && msg.turn && (
-                          <FeedbackStars sessionId={sessionId} turnNumber={msg.turn} strategy={msg.strategy} emotionCluster={msg.emotion} mode="aeif" />
-                        )}
+
+                    {msg.role === 'assistant' && msg.emotion && !msg.crisis && msg.turn && (
+                      <div className="flex items-center gap-2 md:gap-3 flex-wrap mt-0.5">
+                        <FeedbackStars sessionId={sessionId} turnNumber={msg.turn} strategy={msg.strategy} emotionCluster={msg.emotion} mode="aeif" lowConfidence={msg.low_confidence} />
                       </div>
                     )}
-                    <div className="message-time">{msg.time}</div>
+                    <span className="text-[11px] text-on-surface-variant/60 px-1">{msg.time}</span>
                   </div>
                 ))}
                 {loading && (
-                  <div className="message-group assistant">
-                    <div className="typing-bubble">
-                      <div className="typing-dot" />
-                      <div className="typing-dot" />
-                      <div className="typing-dot" />
+                  <div className="flex flex-col gap-1 items-start">
+                    <div className="glass-card rounded-2xl rounded-tl-none border-l-2 border-l-primary p-3 md:p-stack-md inline-flex gap-1.5 items-center shadow-lg">
+                      <div className="w-[7px] h-[7px] rounded-full bg-primary animate-[bounce_1.2s_infinite]" />
+                      <div className="w-[7px] h-[7px] rounded-full bg-primary animate-[bounce_1.2s_infinite]" style={{ animationDelay: '0.15s' }} />
+                      <div className="w-[7px] h-[7px] rounded-full bg-primary animate-[bounce_1.2s_infinite]" style={{ animationDelay: '0.30s' }} />
                     </div>
                   </div>
                 )}
@@ -267,33 +361,67 @@ export default function App() {
             <div ref={bottomRef} />
           </div>
 
-          <div className="input-area">
-            <div className="input-wrap">
+          <div className="shrink-0 px-4 md:px-6 lg:px-8 pb-3 md:pb-4 pt-2 bg-gradient-to-t from-background via-background/95 to-transparent">
+
+            {emotionHistory.length > 0 && (
+              <div className="flex items-center gap-1 overflow-x-auto scroll-hide pb-2 mb-2">
+                {emotionHistory.map((em, i) => (
+                  <div key={i} className="flex items-center gap-0.5 shrink-0">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: (CLUSTER_META[em] || CLUSTER_META.NEUTRAL).color }} />
+                    {i < emotionHistory.length - 1 && (
+                      <div className="w-3 h-px bg-outline-variant/20" />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="glass-panel rounded-full px-4 md:px-5 py-1.5 md:py-2 flex items-center gap-2 shadow-xl backdrop-blur-md border border-outline-variant/20">
               <textarea
                 ref={textareaRef}
-                className="input-field"
-                placeholder="Share what's on your mind…"
+                placeholder="Share what's on your mind..."
                 value={input}
                 onChange={handleTextarea}
                 onKeyDown={handleKey}
                 rows={1}
                 disabled={loading}
+                className="flex-1 bg-transparent border-none focus:outline-none text-on-surface placeholder:text-outline/50 resize-none max-h-[100px] md:max-h-[120px] leading-relaxed text-sm md:text-base py-1.5"
+                style={{ fontFamily: 'Inter, sans-serif' }}
               />
               <button
-                className="send-btn"
                 onClick={() => chat()}
                 disabled={!input.trim() || loading}
+                className="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center hover:opacity-90 active:scale-95 transition-all shadow-lg disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
                 aria-label="Send"
               >
-                ↑
+                <span className="material-symbols-outlined">arrow_upward</span>
               </button>
             </div>
-            <div className="input-hint">
-              Press Enter to send &nbsp;·&nbsp; Shift+Enter for a new line
+            <div className="text-center text-[10px] text-on-surface-variant/40 mt-1.5">
+              Press Enter to send · Shift+Enter for new line
             </div>
           </div>
-        </main>
+        </section>
       </div>
+
+      <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 py-2 bg-surface-container-lowest/80 backdrop-blur-md border-t border-outline-variant/10">
+        <button onClick={() => { setDrawerOpen(false); textareaRef.current?.focus(); }}
+          className={`flex flex-col items-center justify-center p-3 rounded-full transition-all ${!drawerOpen ? 'bg-primary-container/30 text-primary shadow-[0_0_15px_rgba(208,188,255,0.3)]' : 'text-outline'}`}>
+          <span className="material-symbols-outlined" data-weight={!drawerOpen ? 'fill' : '0'}>chat_bubble</span>
+        </button>
+        <button onClick={() => setDrawerOpen(d => !d)}
+          className={`flex flex-col items-center justify-center p-3 transition-all ${drawerOpen ? 'bg-primary-container/30 text-primary rounded-full shadow-[0_0_15px_rgba(208,188,255,0.3)]' : 'text-outline'}`}>
+          <span className="material-symbols-outlined" data-weight={drawerOpen ? 'fill' : '0'}>timeline</span>
+        </button>
+        <button onClick={endSession} disabled={messages.length === 0}
+          className="flex flex-col items-center justify-center text-outline p-3 disabled:opacity-30">
+          <span className="material-symbols-outlined">analytics</span>
+        </button>
+        <button onClick={newSession}
+          className="flex flex-col items-center justify-center text-outline p-3">
+          <span className="material-symbols-outlined">person</span>
+        </button>
+      </nav>
 
       {showSummary && (
         <SessionSummary
@@ -301,578 +429,11 @@ export default function App() {
           trend={sessionData?.trend}
           turnCount={sessionData?.turn_count || messages.length}
           onClose={newSession}
+          hasLowConfidenceTurns={lowConfidenceTurns.length > 0}
+          onConsentGiven={handleConsentGiven}
+          onConsentDeclined={handleConsentDeclined}
         />
       )}
     </>
   );
 }
-
-const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg:          #F7F3EE;
-    --surface:     #FFFFFF;
-    --surface2:    #F0EBE3;
-    --border:      #E2D9CE;
-    --text:        #2C2420;
-    --text-soft:   #7A6A60;
-    --text-faint:  #B8A89A;
-    --accent:      #7C6E5E;
-    --accent-warm: #C4956A;
-    --accent-light:#EDE0D0;
-    --crisis:      #8B2E2E;
-    --crisis-bg:   #FDF0F0;
-    --positive:    #3D6B4F;
-    --positive-bg: #EBF5EE;
-    --negative:    #6B4C3D;
-    --negative-bg: #F5EDE8;
-    --neutral:     #5A6470;
-    --neutral-bg:  #EEF0F2;
-    --ambiguous:   #5A5070;
-    --ambiguous-bg:#EEEDF5;
-    --shadow-sm:   0 1px 3px rgba(44,36,32,0.08);
-    --shadow-md:   0 4px 16px rgba(44,36,32,0.10);
-    --radius:      16px;
-    --radius-sm:   10px;
-    --font-display:'DM Serif Display', Georgia, serif;
-    --font-body:   'DM Sans', system-ui, sans-serif;
-    --transition:  0.2s ease;
-  }
-
-  html, body, #root { height: 100%; }
-
-  body {
-    background: var(--bg);
-    font-family: var(--font-body);
-    color: var(--text);
-    font-size: 15px;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  .disclaimer-overlay {
-    position: fixed; inset: 0;
-    background: rgba(44,36,32,0.55);
-    backdrop-filter: blur(6px);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 100;
-    padding: 24px;
-    animation: fadeIn 0.4s ease;
-  }
-  .disclaimer-card {
-    background: var(--surface);
-    border-radius: 24px;
-    padding: 40px 44px;
-    max-width: 520px; width: 100%;
-    box-shadow: 0 24px 64px rgba(44,36,32,0.18);
-  }
-  .disclaimer-eyebrow {
-    font-size: 11px; font-weight: 500;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--accent-warm);
-    margin-bottom: 12px;
-  }
-  .disclaimer-title {
-    font-family: var(--font-display);
-    font-size: 28px; line-height: 1.25;
-    color: var(--text);
-    margin-bottom: 20px;
-  }
-  .disclaimer-body {
-    color: var(--text-soft);
-    font-size: 14px; line-height: 1.7;
-    margin-bottom: 24px;
-  }
-  .disclaimer-rules {
-    background: var(--surface2);
-    border-radius: var(--radius-sm);
-    padding: 16px 20px;
-    margin-bottom: 28px;
-    list-style: none;
-  }
-  .disclaimer-rules li {
-    font-size: 13px; color: var(--text-soft);
-    padding: 5px 0;
-    display: flex; gap: 10px; align-items: flex-start;
-  }
-  .disclaimer-rules li::before {
-    content: "—"; color: var(--accent-warm); flex-shrink: 0;
-    margin-top: 1px;
-  }
-  .crisis-line {
-    background: var(--crisis-bg);
-    border-left: 3px solid var(--crisis);
-    border-radius: 6px;
-    padding: 12px 16px;
-    margin-bottom: 28px;
-    font-size: 13px; color: var(--crisis);
-    line-height: 1.6;
-  }
-  .crisis-line strong { display: block; margin-bottom: 2px; }
-  .btn-primary {
-    width: 100%;
-    background: var(--text);
-    color: #fff;
-    border: none; border-radius: 12px;
-    padding: 14px 24px;
-    font-family: var(--font-body);
-    font-size: 15px; font-weight: 500;
-    cursor: pointer;
-    transition: background var(--transition), transform var(--transition);
-  }
-  .btn-primary:hover { background: var(--accent); transform: translateY(-1px); }
-  .btn-primary:active { transform: translateY(0); }
-
-  .app {
-    height: 100vh;
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    grid-template-rows: 1fr;
-    position: relative;
-  }
-
-  .sidebar {
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    display: flex; flex-direction: column;
-    padding: 32px 24px;
-    overflow-y: auto;
-  }
-  .sidebar-logo {
-    font-family: var(--font-display);
-    font-size: 22px;
-    color: var(--text);
-    margin-bottom: 4px;
-    font-style: italic;
-  }
-  .sidebar-tagline {
-    font-size: 12px; color: var(--text-faint);
-    font-weight: 300;
-    margin-bottom: 24px;
-  }
-  .sidebar-label {
-    font-size: 10px; font-weight: 500;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--text-faint);
-    margin-bottom: 12px;
-  }
-  .sidebar-stats {
-    display: flex; flex-direction: column;
-    gap: 6px;
-    margin-bottom: 20px;
-  }
-  .stat-row {
-    display: flex; align-items: center;
-    gap: 10px;
-    padding: 6px 10px;
-    border-radius: 8px;
-    transition: background var(--transition);
-  }
-  .stat-row:hover { background: var(--surface2); }
-  .stat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .stat-name { font-size: 12px; color: var(--text-soft); flex: 1; }
-  .stat-count {
-    font-size: 12px; font-weight: 500;
-    color: var(--text);
-    font-variant-numeric: tabular-nums;
-  }
-  .stat-bar-wrap { width: 100%; height: 3px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
-  .stat-bar { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
-  .sidebar-divider { height: 1px; background: var(--border); margin: 16px 0; }
-
-  .btn-secondary {
-    display: flex; align-items: center; gap: 8px;
-    background: none; border: 1px solid var(--border);
-    border-radius: 10px; padding: 10px 14px;
-    color: var(--text-soft); font-size: 13px;
-    font-family: var(--font-body);
-    cursor: pointer;
-    transition: all var(--transition);
-    width: 100%;
-    margin-bottom: 8px;
-  }
-  .btn-secondary:hover:not(:disabled) {
-    background: var(--surface2);
-    color: var(--text);
-    border-color: var(--accent);
-  }
-  .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  .sidebar-footer {
-    margin-top: auto;
-    font-size: 11px; color: var(--text-faint);
-    line-height: 1.5;
-  }
-
-  .chat-main {
-    display: flex; flex-direction: column;
-    height: 100vh; overflow: hidden;
-  }
-  .chat-header {
-    padding: 20px 32px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 12px;
-    background: var(--surface);
-    flex-shrink: 0;
-  }
-  .header-avatar {
-    width: 36px; height: 36px; border-radius: 50%;
-    background: var(--accent-light);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
-  }
-  .header-name {
-    font-family: var(--font-display);
-    font-size: 17px; color: var(--text);
-  }
-  .header-status { font-size: 12px; color: var(--text-faint); }
-  .header-online {
-    display: inline-block;
-    width: 6px; height: 6px; border-radius: 50%;
-    background: #5BAD7A;
-    margin-right: 4px;
-    vertical-align: middle;
-  }
-
-  .messages-wrap {
-    flex: 1; overflow-y: auto;
-    padding: 32px;
-    display: flex; flex-direction: column;
-    gap: 24px;
-    scroll-behavior: smooth;
-  }
-  .messages-wrap::-webkit-scrollbar { width: 4px; }
-  .messages-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  .message-group {
-    display: flex; flex-direction: column;
-    gap: 4px;
-    animation: slideUp 0.3s ease;
-  }
-  .message-group.user { align-items: flex-end; }
-  .message-group.assistant { align-items: flex-start; }
-
-  .message-bubble {
-    max-width: 62%;
-    padding: 14px 18px;
-    border-radius: 18px;
-    font-size: 15px; line-height: 1.6;
-    position: relative;
-  }
-  .message-group.user .message-bubble {
-    background: var(--text);
-    color: #fff;
-    border-bottom-right-radius: 4px;
-  }
-  .message-group.assistant .message-bubble {
-    background: var(--surface);
-    color: var(--text);
-    border: 1px solid var(--border);
-    border-bottom-left-radius: 4px;
-    box-shadow: var(--shadow-sm);
-  }
-  .message-bubble.crisis {
-    background: var(--crisis-bg);
-    border-color: #E8B4B4;
-    border-left: 3px solid var(--crisis);
-  }
-
-  .message-meta {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-top: 2px;
-  }
-
-  .emotion-tag {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 3px 9px;
-    border-radius: 20px;
-    font-size: 11px; font-weight: 500;
-    letter-spacing: 0.04em;
-  }
-  .emotion-dot { width: 5px; height: 5px; border-radius: 50%; }
-
-  .message-time {
-    font-size: 11px; color: var(--text-faint);
-    margin-top: 2px;
-    padding: 0 4px;
-  }
-
-  .typing-bubble {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 18px; border-bottom-left-radius: 4px;
-    padding: 14px 18px;
-    display: inline-flex; gap: 5px; align-items: center;
-    box-shadow: var(--shadow-sm);
-  }
-  .typing-dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--text-faint);
-    animation: bounce 1.2s infinite;
-  }
-  .typing-dot:nth-child(2) { animation-delay: 0.15s; }
-  .typing-dot:nth-child(3) { animation-delay: 0.30s; }
-
-  .welcome-state {
-    flex: 1; display: flex;
-    flex-direction: column; align-items: center; justify-content: center;
-    text-align: center; gap: 16px;
-    padding: 40px;
-    color: var(--text-soft);
-  }
-  .welcome-icon {
-    font-size: 40px;
-    background: var(--accent-light);
-    width: 72px; height: 72px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 8px;
-  }
-  .welcome-title {
-    font-family: var(--font-display);
-    font-size: 24px; color: var(--text);
-    font-style: italic;
-  }
-  .welcome-body { font-size: 14px; max-width: 320px; line-height: 1.7; }
-  .welcome-suggestions { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
-  .suggestion-chip {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 8px 18px;
-    font-size: 13px; color: var(--text-soft);
-    cursor: pointer;
-    transition: all var(--transition);
-    font-family: var(--font-body);
-  }
-  .suggestion-chip:hover {
-    background: var(--accent-light);
-    border-color: var(--accent-warm);
-    color: var(--text);
-  }
-
-  .input-area {
-    padding: 20px 32px 24px;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .input-wrap {
-    display: flex; align-items: flex-end; gap: 12px;
-    background: var(--bg);
-    border: 1.5px solid var(--border);
-    border-radius: 16px;
-    padding: 12px 16px;
-    transition: border-color var(--transition), box-shadow var(--transition);
-  }
-  .input-wrap:focus-within {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(124,110,94,0.10);
-  }
-  .input-field {
-    flex: 1; border: none; background: transparent;
-    font-family: var(--font-body);
-    font-size: 15px; color: var(--text);
-    resize: none; outline: none;
-    max-height: 120px; line-height: 1.5;
-    padding: 2px 0;
-  }
-  .input-field::placeholder { color: var(--text-faint); }
-  .send-btn {
-    width: 38px; height: 38px; border-radius: 10px;
-    background: var(--text); border: none;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; flex-shrink: 0;
-    transition: background var(--transition), transform var(--transition);
-    color: white; font-size: 16px;
-  }
-  .send-btn:hover:not(:disabled) { background: var(--accent); transform: scale(1.05); }
-  .send-btn:disabled { background: var(--border); cursor: not-allowed; transform: none; }
-  .input-hint { text-align: center; font-size: 11px; color: var(--text-faint); margin-top: 10px; }
-
-  /* Emotion Pulse */
-  .emotion-pulse {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 100%;
-    pointer-events: none;
-    z-index: 0;
-  }
-  .pulse-ring {
-    position: absolute;
-    top: -200px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 600px;
-    height: 400px;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.6;
-    animation: softPulse 4s ease-in-out infinite;
-  }
-
-  /* Strategy Badge */
-  .strategy-badge {
-    display: flex; align-items: center; gap: 6px;
-    padding: 6px 12px;
-    background: var(--surface2);
-    border-radius: 20px;
-    font-size: 11px; font-weight: 500;
-    color: var(--text-soft);
-    margin-bottom: 8px;
-  }
-  .strategy-dot {
-    width: 5px; height: 5px; border-radius: 50%;
-    background: var(--accent-warm);
-  }
-
-  /* Trend Timeline */
-  .trend-timeline {
-    padding: 12px 0;
-    margin-bottom: 8px;
-  }
-  .timeline-label {
-    font-size: 10px; font-weight: 500;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--text-faint);
-    margin-bottom: 10px;
-  }
-  .timeline-track {
-    display: flex;
-    align-items: center;
-    gap: 0;
-  }
-  .timeline-dot-wrap {
-    display: flex;
-    align-items: center;
-  }
-  .timeline-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    transition: transform 0.2s ease;
-    flex-shrink: 0;
-  }
-  .timeline-dot.current {
-    transform: scale(1.4);
-    box-shadow: 0 0 0 3px rgba(44,36,32,0.08);
-  }
-  .timeline-connector {
-    width: 12px;
-    height: 2px;
-    opacity: 0.4;
-  }
-
-  /* Feedback Stars */
-  .feedback-stars {
-    display: inline-flex;
-    gap: 2px;
-    align-items: center;
-  }
-  .star-btn {
-    background: none;
-    border: none;
-    font-size: 14px;
-    color: var(--text-faint);
-    cursor: pointer;
-    padding: 0 1px;
-    transition: color 0.15s ease, transform 0.15s ease;
-    line-height: 1;
-  }
-  .star-btn.active {
-    color: var(--accent-warm);
-  }
-  .star-btn:hover {
-    transform: scale(1.2);
-  }
-
-  /* Session Summary */
-  .summary-overlay {
-    position: fixed; inset: 0;
-    background: rgba(44,36,32,0.55);
-    backdrop-filter: blur(6px);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 100;
-    padding: 24px;
-    animation: fadeIn 0.4s ease;
-  }
-  .summary-card {
-    background: var(--surface);
-    border-radius: 24px;
-    padding: 40px 44px;
-    max-width: 480px; width: 100%;
-    box-shadow: 0 24px 64px rgba(44,36,32,0.18);
-    text-align: center;
-  }
-  .summary-icon {
-    font-size: 40px;
-    margin-bottom: 16px;
-  }
-  .summary-title {
-    font-family: var(--font-display);
-    font-size: 24px;
-    color: var(--text);
-    margin-bottom: 12px;
-  }
-  .summary-message {
-    color: var(--text-soft);
-    font-size: 14px;
-    margin-bottom: 24px;
-  }
-  .summary-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 20px;
-  }
-  .summary-stat {
-    background: var(--surface2);
-    border-radius: var(--radius-sm);
-    padding: 16px;
-  }
-  .summary-stat-label {
-    display: block;
-    font-size: 11px;
-    color: var(--text-faint);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 6px;
-  }
-  .summary-stat-value {
-    font-family: var(--font-display);
-    font-size: 20px;
-    color: var(--text);
-  }
-  .summary-trend {
-    color: var(--text-soft);
-    font-size: 14px;
-    line-height: 1.7;
-    margin-bottom: 20px;
-    font-style: italic;
-  }
-  .summary-reminder {
-    font-size: 12px;
-    color: var(--text-faint);
-    margin-bottom: 24px;
-    line-height: 1.6;
-  }
-
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes bounce { 0%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-6px); } }
-  @keyframes softPulse {
-    0%, 100% { opacity: 0.4; transform: translateX(-50%) scale(1); }
-    50% { opacity: 0.7; transform: translateX(-50%) scale(1.05); }
-  }
-
-  @media (max-width: 700px) {
-    .app { grid-template-columns: 1fr; }
-    .sidebar { display: none; }
-    .messages-wrap, .input-area { padding-left: 16px; padding-right: 16px; }
-    .message-bubble { max-width: 88%; }
-  }
-`;

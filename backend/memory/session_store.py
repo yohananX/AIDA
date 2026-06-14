@@ -18,7 +18,7 @@ class SessionStore:
     def __init__(self):
         self.sessions: dict[str, list[dict]] = defaultdict(list)
 
-    def _new_entry(self, role: str, text: str, emotion_cluster: str, raw_emotion: str, confidence: float, strategy: str = "") -> dict:
+    def _new_entry(self, role: str, text: str, emotion_cluster: str, raw_emotion: str, confidence: float, strategy: str = "", low_confidence: bool = False) -> dict:
         return {
             "role": role,
             "text": text,
@@ -27,10 +27,11 @@ class SessionStore:
             "confidence": confidence,
             "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
             "strategy": strategy,
+            "low_confidence": low_confidence,
         }
 
-    def add_message(self, session_id: str, role: str, text: str, emotion_cluster: str = "NEUTRAL", raw_emotion: str = "neutral", confidence: float = 0.0, strategy: str = "") -> dict:
-        entry = self._new_entry(role, text, emotion_cluster, raw_emotion, confidence, strategy)
+    def add_message(self, session_id: str, role: str, text: str, emotion_cluster: str = "NEUTRAL", raw_emotion: str = "neutral", confidence: float = 0.0, strategy: str = "", low_confidence: bool = False) -> dict:
+        entry = self._new_entry(role, text, emotion_cluster, raw_emotion, confidence, strategy, low_confidence)
         session = self.sessions[session_id]
         session.append(entry)
         if len(session) > MAX_TURNS:

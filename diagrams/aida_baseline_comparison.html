@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>AIDA Response Evaluation Study</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(145deg, #eef4fc 0%, #ffffff 100%);
+            color: #1a2b4c;
+            line-height: 1.5;
+            padding: 1.5rem 1rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 950px;
+            width: 100%;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.7);
+            border-radius: 2.5rem;
+            padding: 2rem 1.8rem;
+            box-shadow: 0 20px 35px rgba(0,20,50,0.08);
+        }
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 500;
+            color: #0b3b5c;
+            margin-bottom: 0.5rem;
+            border-left: 5px solid #6c9bd2;
+            padding-left: 1.2rem;
+        }
+        .instruction {
+            background: #e7f0fd;
+            border-radius: 1.4rem;
+            padding: 1.2rem 1.5rem;
+            margin: 1.3rem 0 2rem;
+            color: #1e3b5a;
+            font-size: 1rem;
+            border: 1px solid #cbddec;
+        }
+        .round {
+            margin-bottom: 2.8rem;
+            background: white;
+            border-radius: 2rem;
+            padding: 1.8rem 1.5rem;
+            box-shadow: 0 8px 18px rgba(33,65,112,0.07);
+            border: 1px solid #e6f0fa;
+        }
+        .user-message-box {
+            background: #fcf3d4;
+            border-left: 6px solid #f0b34b;
+            padding: 1.2rem 1.5rem;
+            border-radius: 1.2rem;
+            margin-bottom: 2rem;
+            font-weight: 500;
+            color: #3e3a2b;
+            font-size: 1.1rem;
+        }
+        .user-message-box::before { content: "💬 User said: "; font-weight: 700; }
+        .responses-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        .response-card {
+            background: #f9fcff;
+            border: 1.5px solid #dce9f5;
+            border-radius: 1.4rem;
+            padding: 1.3rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .response-label {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #2c5a7a;
+            margin-bottom: 0.7rem;
+            border-bottom: 2px dashed #cbddec;
+            padding-bottom: 0.4rem;
+        }
+        .response-text {
+            font-style: italic;
+            background: #ffffff;
+            padding: 0.9rem;
+            border-radius: 0.9rem;
+            margin: 0.5rem 0 1rem;
+            color: #1f2e44;
+            border: 1px solid #eaf1fb;
+            font-size: 0.98rem;
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+        .dimensions { margin-top: 0.7rem; display: flex; flex-direction: column; gap: 1.1rem; }
+        .dimension-row { display: flex; flex-direction: column; gap: 0.3rem; }
+        .dim-name { font-weight: 600; font-size: 0.85rem; color: #1e405b; }
+        .dim-guide {
+            font-size: 0.72rem;
+            color: #526e88;
+            background: #f0f6fe;
+            border-radius: 0.5rem;
+            padding: 0.3rem 0.5rem;
+            margin-bottom: 0.2rem;
+            line-height: 1.4;
+        }
+        .radio-group { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: #f2f7fe;
+            padding: 0.3rem 0.8rem;
+            border-radius: 2rem;
+            border: 1px solid #d7e4f5;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .radio-option:hover { background: #e1edfd; }
+        input[type="radio"] {
+            appearance: none;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid #7a9bcb;
+            border-radius: 50%;
+            cursor: pointer;
+            background: white;
+            transition: 0.15s;
+        }
+        input[type="radio"]:checked {
+            background: #2c6289;
+            border-color: #1d405a;
+            box-shadow: inset 0 0 0 3px white;
+        }
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0 1rem;
+        }
+        .btn {
+            border: 1.5px solid #30638b;
+            padding: 0.8rem 1.8rem;
+            border-radius: 3rem;
+            font-weight: 600;
+            color: #1e405b;
+            font-size: 0.95rem;
+            cursor: pointer;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.03);
+        }
+        .btn-primary { background: #1e4a6b; border-color: #0e3247; color: white; }
+        .btn:hover { transform: translateY(-1px); }
+        .results-panel {
+            margin-top: 2rem;
+            background: #f6fafe;
+            border-radius: 1.8rem;
+            padding: 1.5rem;
+            border: 1px solid #cadff5;
+        }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 1rem; overflow: hidden; font-size: 0.85rem; margin: 1rem 0; }
+        th { background: #e3effa; color: #10344e; font-weight: 600; padding: 0.7rem; text-align: left; }
+        td, th { padding: 0.55rem 0.7rem; border-bottom: 1px solid #d7e5f5; }
+        .overall-winner { background: #d9ecfa; border-radius: 2rem; padding: 0.7rem 1.2rem; margin: 1rem 0; font-weight: 600; }
+        hr { border: 0.5px solid #cde0f5; margin: 1.2rem 0; }
+        @media (max-width: 650px) {
+            .responses-grid { grid-template-columns: 1fr; }
+            .container { padding: 1.5rem 1rem; }
+            h1 { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>AIDA Response Evaluation Study</h1>
+    <div class="instruction">
+        <strong>📋 Instructions:</strong> You will see a user message followed by two AI responses. 
+        Rate each response on 5 dimensions using the scale 1–3. 
+        Each dimension has a short guide to help you decide. 
+        Complete all ratings for all 6 responses, then click <strong>View Results</strong>.
+        You do not know which system produced each response — rate based only on what you read.
+    </div>
+    <div id="rounds-container"></div>
+    <div class="actions">
+        <button class="btn btn-primary" id="viewResultsBtn">📊 View Results</button>
+        <button class="btn" id="downloadCsvBtn">⬇️ Download Results as CSV</button>
+    </div>
+    <div id="resultsPanel" class="results-panel" style="display:none;"></div>
+</div>
+
+<script>
+(function() {
+    const roundsData = [
+        {
+            userMessage: "I have been feeling really sad and hopeless for a while now",
+            responses: [
+                "Feeling sad and hopeless can be a really tough and overwhelming experience. It sounds like you're carrying a heavy emotional weight right now. What's been the most difficult part of navigating these feelings for you?",
+                "It can be really tough to feel that way, and it's completely okay to acknowledge those emotions. Sometimes just recognizing how we're feeling can be the first step towards feeling a little better. It sounds like you've been carrying a heavy heart for a while, and I'm here to listen if you want to talk about what's been going on — what's been on your mind lately?"
+            ]
+        },
+        {
+            userMessage: "I keep thinking nothing will ever change and I am just tired of trying",
+            responses: [
+                "Those thoughts of nothing changing and feeling tired of trying can be really draining and exhausting. It sounds like you're feeling a sense of hopelessness and frustration. What's leading you to feel like giving up on things right now?",
+                "It can be really exhausting to feel like you're putting in effort without seeing any progress or positive change. It's understandable that you'd start to feel like giving up, but I want you to know that I'm here for you and I care about what you're going through. Sometimes just talking about these feelings can help shift your perspective a little — what's one thing that you used to enjoy doing that you haven't done in a while?"
+            ]
+        },
+        {
+            userMessage: "Sometimes I wonder what the point of everything is",
+            responses: [
+                "It can be a really unsettling feeling to question the purpose of everything, like the ground beneath you has shifted. This kind of wondering can leave you feeling lost and unsure about which direction to turn. What does it feel like when you're in the midst of asking yourself these big questions about life?",
+                "It's a big question that can be really overwhelming to think about, and it's normal to have moments where we feel unsure about the meaning of life. You're not alone in wondering about this, and it's okay to not have all the answers. What do you think might give your life more purpose or fulfillment if you could make a change?"
+            ]
+        }
+    ];
+
+    const dimensions = [
+        {
+            key: 'emotionalAck',
+            name: '1. Emotional Acknowledgement',
+            guide: '1 = Generic ("that sounds hard") | 2 = Names the feeling but stays surface | 3 = Reflects the specific feeling precisely using the user\'s own words or situation'
+        },
+        {
+            key: 'avoidAdvice',
+            name: '2. Avoidance of Premature Advice',
+            guide: '1 = Jumps straight to advice or solutions before understanding the situation | 2 = Acknowledges feeling but also gives advice in the same response | 3 = Stays fully with the feeling — no advice, no silver linings, no reframes'
+        },
+        {
+            key: 'questionQuality',
+            name: '3. Question Quality',
+            guide: '1 = Closed ("are you okay?") or very generic ("how are you feeling?") | 2 = Open but could apply to anyone | 3 = Open and specifically connected to what this user just said'
+        },
+        {
+            key: 'toneAppropriate',
+            name: '4. Tone Appropriateness',
+            guide: '1 = Tone feels wrong for the moment (too cheerful, too clinical, too heavy) | 2 = Neutral — not wrong but not warm either | 3 = Warm and calm in a way that fits the emotional moment'
+        },
+        {
+            key: 'absenceClinical',
+            name: '5. Naturalness of Language',
+            guide: '1 = Multiple phrases that feel scripted or hollow (e.g. "I\'m here to listen", "your feelings are valid", "it\'s okay to feel this way") | 2 = One such phrase | 3 = Sounds like a genuine human response — no scripted filler'
+        }
+    ];
+
+    const ratings = {};
+
+    function initializeRatings() {
+        roundsData.forEach((_, rIdx) => {
+            ratings[rIdx] = { 0: {}, 1: {} };
+            dimensions.forEach(dim => {
+                ratings[rIdx][0][dim.key] = null;
+                ratings[rIdx][1][dim.key] = null;
+            });
+        });
+    }
+
+    function renderAllRounds() {
+        const container = document.getElementById('rounds-container');
+        let html = '';
+        roundsData.forEach((round, roundIndex) => {
+            html += `<div class="round">
+                <div class="user-message-box">${round.userMessage}</div>
+                <div class="responses-grid">
+                    ${round.responses.map((respText, respIdx) => `
+                        <div class="response-card">
+                            <div class="response-label">Response ${respIdx + 1}</div>
+                            <div class="response-text">"${respText}"</div>
+                            <div class="dimensions">
+                                ${dimensions.map(dim => `
+                                    <div class="dimension-row">
+                                        <div class="dim-name">${dim.name}</div>
+                                        <div class="dim-guide">${dim.guide}</div>
+                                        <div class="radio-group">
+                                            ${[1,2,3].map(v => `
+                                                <label class="radio-option">
+                                                    <input type="radio" name="r${roundIndex}_resp${respIdx}_${dim.key}" value="${v}"> ${v}
+                                                </label>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>`;
+        });
+        container.innerHTML = html;
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', e => {
+                const parts = e.target.name.split('_');
+                const rIdx = parseInt(parts[0].substring(1));
+                const respIdx = parseInt(parts[1].replace('resp',''));
+                const dimKey = parts.slice(2).join('_');
+                ratings[rIdx][respIdx][dimKey] = parseInt(e.target.value);
+            });
+        });
+    }
+
+    function computeScores() {
+        return roundsData.map((round, rIdx) => ({
+            round: rIdx + 1,
+            userMessage: round.userMessage,
+            responses: [0,1].map(respIdx => {
+                let total = 0;
+                const dimScores = {};
+                dimensions.forEach(dim => {
+                    const val = ratings[rIdx][respIdx][dim.key] || 0;
+                    dimScores[dim.key] = val;
+                    total += val;
+                });
+                return { label: `Response ${respIdx+1}`, dimScores, total };
+            })
+        }));
+    }
+
+    function checkAllRated() {
+        for (let rIdx = 0; rIdx < roundsData.length; rIdx++)
+            for (let respIdx = 0; respIdx < 2; respIdx++)
+                for (let dim of dimensions)
+                    if (ratings[rIdx][respIdx][dim.key] === null) return false;
+        return true;
+    }
+
+    document.getElementById('viewResultsBtn').addEventListener('click', () => {
+        if (!checkAllRated()) { alert("⚠️ Please complete all ratings before viewing results."); return; }
+        const results = computeScores();
+        let html = '<h3 style="margin-bottom:1rem;color:#113753;">📋 Evaluation Results</h3>';
+        let totalR1 = 0, totalR2 = 0;
+        results.forEach(round => {
+            const r1 = round.responses[0], r2 = round.responses[1];
+            totalR1 += r1.total; totalR2 += r2.total;
+            const winner = r1.total > r2.total ? r1.label : r2.total > r1.total ? r2.label : 'Tie';
+            html += `<div style="margin:1.5rem 0 0.5rem;"><strong>Round ${round.round}</strong> — "${round.userMessage}"</div>
+            <table><thead><tr><th>Dimension</th><th>${r1.label}</th><th>${r2.label}</th></tr></thead><tbody>`;
+            dimensions.forEach(dim => {
+                html += `<tr><td>${dim.name}</td><td>${r1.dimScores[dim.key]}</td><td>${r2.dimScores[dim.key]}</td></tr>`;
+            });
+            html += `<tr style="font-weight:700;background:#f0f6fe;"><td>Total / 15</td><td>${r1.total}</td><td>${r2.total}</td></tr>
+            </tbody></table><div class="overall-winner">🏆 Round ${round.round}: ${winner} scores higher</div>`;
+        });
+        html += `<hr><div class="overall-winner" style="font-size:1.1rem;">
+            🌟 Overall: ${totalR1 > totalR2 ? 'Response 1' : totalR2 > totalR1 ? 'Response 2' : 'Tie'} 
+            (Response 1: ${totalR1}/45 — Response 2: ${totalR2}/45)
+        </div>`;
+        const panel = document.getElementById('resultsPanel');
+        panel.innerHTML = html;
+        panel.style.display = 'block';
+        panel.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    document.getElementById('downloadCsvBtn').addEventListener('click', () => {
+        if (!checkAllRated()) { alert("⚠️ Please complete all ratings before downloading."); return; }
+        const results = computeScores();
+        const ts = new Date().toISOString().replace(/[:.]/g,'-');
+        let csv = "Round,User Message,Response,Dimension,Score\n";
+        results.forEach(round => {
+            round.responses.forEach(resp => {
+                dimensions.forEach(dim => {
+                    csv += `Round ${round.round},"${round.userMessage.replace(/"/g,'""')}",${resp.label},${dim.name},${resp.dimScores[dim.key]}\n`;
+                });
+            });
+        });
+        csv += "\nSummary\nRound,Response,Total\n";
+        results.forEach(round => {
+            round.responses.forEach(resp => {
+                csv += `Round ${round.round},${resp.label},${resp.total}\n`;
+            });
+        });
+        const a = document.createElement('a');
+        a.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+        a.download = `AIDA_ratings_${ts}.csv`;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    });
+
+    initializeRatings();
+    renderAllRounds();
+})();
+</script>
+</body>
+</html>

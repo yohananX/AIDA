@@ -21,9 +21,13 @@ from trend.trend_analyzer import TrendAnalyzer
 from strategy.strategy_engine import StrategyEngine
 from llm.prompt_builder import PromptBuilder
 from llm.groq_client import GroqClient
+from llm.gemini_client import GeminiClient
 from feedback.feedback_store import FeedbackStore
+from data_collection.collector import DataCollector
 
 logger = logging.getLogger(__name__)
+
+LOW_CONFIDENCE_THRESHOLD = 0.55
 
 CRISIS_RESPONSE = """I hear that you're carrying something very heavy right now, and I'm glad you reached out.
 
@@ -35,15 +39,15 @@ Please speak to someone who can truly be there for you:
 You do not have to face this alone. 💙"""
 
 TEMPLATE_FALLBACKS = {
-    "VALIDATION_AND_REFLECTION": "That sounds incredibly difficult. I want you to know that what you're feeling is completely valid, and I'm here to listen without any judgment.",
-    "GROUNDING": "I can hear how overwhelming this feels right now. Let's take a gentle moment together — can you notice three things you can hear around you?",
-    "CALM_REFLECTION": "That sounds really frustrating. I can understand why you'd feel that way. Would you like to tell me more about what happened?",
-    "ENCOURAGEMENT": "It sounds like things are shifting in a better direction. That takes real strength. What do you think helped make that change?",
-    "POSITIVE_REINFORCEMENT": "That's wonderful to hear. It's important to recognise these positive moments. What do you think is contributing to how you feel right now?",
-    "EXPLORATORY_INQUIRY": "I'm picking up on a few different emotions there. Could you help me understand a bit more about what's going on?",
-    "VALIDATION": "I hear you. That's a lot to carry. I'm here to listen whenever you're ready.",
-    "CLARIFICATION_REQUEST": "I want to make sure I understand you correctly. Could you tell me a bit more about what you mean?",
-    "OPEN_CHECKIN": "Thanks for sharing. How are you feeling about things right now?",
+    "VALIDATION_AND_REFLECTION": "That's really heavy. I'm here with you in it.",
+    "GROUNDING": "Let's take a breath together. What's one thing you can see right now?",
+    "DIRECT_ENGAGEMENT": "Alright. Tell me what actually set this off.",
+    "ENCOURAGEMENT": "You've been climbing out of a hard place. That takes real strength.",
+    "POSITIVE_REINFORCEMENT": "That's genuinely great to hear. You've earned that peace.",
+    "EXPLORATORY_INQUIRY": "Things seem to be moving around a bit. What's shifting for you right now?",
+    "VALIDATION": "That's a lot to carry. I'm here whenever you're ready.",
+    "CLARIFICATION_REQUEST": "I want to make sure I understand. Could you tell me a bit more?",
+    "OPEN_CHECKIN": "How are you feeling about things right now?",
 }
 
 
@@ -55,8 +59,10 @@ class AEIFPipeline:
         self.trend_analyzer = TrendAnalyzer()
         self.strategy_engine = StrategyEngine()
         self.prompt_builder = PromptBuilder()
+        self.gemini_client = GeminiClient()
         self.groq_client = GroqClient()
-        self.feedback_store = FeedbackStore()
+        self.data_collector = DataCollector()
+        self.feedback_store = FeedbackStore(data_collector=self.data_collector)
 
     def process_message(self, message: str, session_id: str, use_aeif: bool = True) -> dict:
         if not message or not message.strip():
@@ -97,11 +103,14 @@ class AEIFPipeline:
         raw_emotion = emotion_result["raw_emotion"]
         confidence = emotion_result["confidence"]
 
+        is_low_confidence = not is_crisis and confidence < LOW_CONFIDENCE_THRESHOLD
+
         # Layer 3: Memory Update (user message)
         self.session_store.add_message(
             session_id, "user", message,
             emotion_cluster=emotion_cluster, raw_emotion=raw_emotion,
-            confidence=confidence, strategy=""
+            confidence=confidence, strategy="",
+            low_confidence=is_low_confidence,
         )
 
         if use_aeif:
@@ -126,6 +135,19 @@ class AEIFPipeline:
             confidence=confidence, strategy=strategy
         )
 
+        if is_low_confidence:
+            self.data_collector.record_low_confidence_turn(
+                session_id=session_id,
+                turn_number=self.session_store.get_turn_count(session_id) // 2,
+                message=message,
+                emotion=emotion_cluster,
+                confidence=confidence,
+                raw_emotion=raw_emotion,
+                trend=trend,
+                strategy=strategy,
+                llm_response=response,
+            )
+
         return {
             "response": response,
             "emotion_cluster": emotion_cluster,
@@ -137,28 +159,31 @@ class AEIFPipeline:
             "session_id": session_id,
             "turn_number": self.session_store.get_turn_count(session_id) // 2,
             "mode": "aeif" if use_aeif else "baseline",
+            "low_confidence": is_low_confidence,
         }
 
     def _generate_baseline_response(self, message: str, session_id: str) -> str:
-        if self.groq_client.available():
-            try:
-                history = self.session_store.get_history(session_id)
-                messages = self.prompt_builder.build_baseline(history)
-                messages.append({"role": "user", "content": message})
-                return self.groq_client.generate(messages)
-            except Exception as e:
-                logger.warning(f"Baseline LLM failed ({e}), using standard fallback")
+        for client_name, client in [("Gemini", self.gemini_client), ("Groq", self.groq_client)]:
+            if client.available():
+                try:
+                    history = self.session_store.get_history(session_id)
+                    messages = self.prompt_builder.build_baseline(history)
+                    messages.append({"role": "user", "content": message})
+                    return client.generate(messages, max_tokens=200, temperature=0.8)
+                except Exception as e:
+                    logger.warning(f"Baseline {client_name} failed ({e}), trying next")
         return TEMPLATE_FALLBACKS["OPEN_CHECKIN"]
 
     def _generate_response(self, message: str, emotion_cluster: str, trend: str, strategy: str, session_id: str) -> str:
-        if self.groq_client.available():
-            try:
-                history = self.session_store.get_history(session_id)
-                messages = self.prompt_builder.build(emotion_cluster, trend, strategy, history)
-                messages.append({"role": "user", "content": message})
-                return self.groq_client.generate(messages)
-            except Exception as e:
-                logger.warning(f"LLM generation failed ({e}), using template fallback")
+        for client_name, client in [("Gemini", self.gemini_client), ("Groq", self.groq_client)]:
+            if client.available():
+                try:
+                    history = self.session_store.get_history(session_id)
+                    messages = self.prompt_builder.build(emotion_cluster, trend, strategy, history)
+                    messages.append({"role": "user", "content": message})
+                    return client.generate(messages, max_tokens=200, temperature=0.8)
+                except Exception as e:
+                    logger.warning(f"{client_name} failed ({e}), trying next")
 
         fallback = TEMPLATE_FALLBACKS.get(strategy, TEMPLATE_FALLBACKS["OPEN_CHECKIN"])
         return fallback

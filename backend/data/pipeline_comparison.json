@@ -6,7 +6,7 @@
         "emotion_cluster": "SADNESS",
         "trend": "INSUFFICIENT_DATA",
         "strategy": "VALIDATION",
-        "response": "I'm so sorry to hear that you're feeling this way, and it's completely understandable to feel overwhelmed after a tough experience like that. Failing an exam can be really disappointing, and it's normal to feel like giving up when things don't go as planned. You're not alone in feeling this way, and I'm here to listen and offer support. What's been going through your mind since you found out about the exam results?",
+        "response": "I'm so sorry to hear that you're feeling this way, and I'm here to listen. Failing an exam can be really tough and disappointing. It's completely understandable that you're feeling sad and like giving up right now. What's going through your mind when you think about what happens next?",
         "confidence": 0.9814
       },
       {
@@ -14,7 +14,7 @@
         "emotion_cluster": "SADNESS",
         "trend": "INSUFFICIENT_DATA",
         "strategy": "VALIDATION",
-        "response": "It can be really tough to feel down for an extended period, and it's completely understandable that you're feeling this way, especially after a disappointing experience like failing an exam. I'm here to listen and offer support, and I want you to know that I care about how you're feeling. It takes a lot of courage to acknowledge and share your emotions, so thank you for being open with me. What's been the most challenging part of your day lately?",
+        "response": "It can be really tough to feel down for a while, and it's okay to acknowledge those feelings. I'm here to listen and offer support in any way I can. It sounds like things have been weighing on you, and I want you to know that I'm here for you. What's been the hardest part for you to deal with lately?",
         "confidence": 0.9878
       },
       {
@@ -22,7 +22,7 @@
         "emotion_cluster": "SADNESS",
         "trend": "PERSISTENT_DISTRESS",
         "strategy": "VALIDATION_AND_REFLECTION",
-        "response": "It can be really tough to feel disconnected from the things that usually bring you joy. This feeling of emptiness can be especially hard to navigate when it feels like nothing is sparking your interest. I'm here to listen and support you as you work through these feelings. What's one thing that you used to enjoy doing, even if it doesn't feel appealing right now?",
+        "response": "It can be really discouraging when things that used to bring you joy no longer do, and it's like you're just going through the motions. It's like a spark is missing, and it's hard to find the energy to care about things. I'm here to listen and support you, and I want you to know that I'm not here to judge. What's one thing that you used to enjoy doing that you haven't done in a while?",
         "confidence": 0.7945
       }
     ],
@@ -32,7 +32,7 @@
         "emotion_cluster": "SADNESS",
         "trend": "INSUFFICIENT_DATA",
         "strategy": "STANDARD",
-        "response": "I'm so sorry to hear that you're feeling this way, it can be really tough to deal with disappointment. Failing an exam doesn't define your worth or abilities, and many people have been in your shoes before. It's okay to feel upset, and it's normal to need some time to process your emotions. What's been going through your mind since you found out about your exam results?",
+        "response": "I'm so sorry to hear that you're feeling this way, it can be really tough to deal with disappointment and frustration. It's completely normal to feel like giving up when things don't go as planned. Remember that one setback doesn't define your entire journey or your worth as a person. What's been going through your mind since you found out about the exam results?",
         "confidence": 0.9814
       },
       {
@@ -40,7 +40,7 @@
         "emotion_cluster": "SADNESS",
         "trend": "INSUFFICIENT_DATA",
         "strategy": "STANDARD",
-        "response": "It can be really tough to feel down for a while, and it's okay to acknowledge those feelings. Sometimes it helps to talk about what's been on your mind and in your heart. It sounds like you're carrying a heavy emotional load, and I'm here to listen. What's one thing that's been weighing on your mind lately?",
+        "response": "It can be really tough to navigate low feelings, and it's okay to acknowledge them. Sometimes, it helps to take things one step at a time and focus on the present moment. Would you like to talk about what's been on your mind lately, or is there something specific that's been weighing you down? What's been the hardest part for you to deal with recently?",
         "confidence": 0.9878
       },
       {
@@ -48,7 +48,7 @@
         "emotion_cluster": "SADNESS",
         "trend": "INSUFFICIENT_DATA",
         "strategy": "STANDARD",
-        "response": "It can be really tough to feel disconnected from the things that usually bring you joy. Sometimes this can be a sign that you're just feeling a bit drained or overwhelmed. It might be helpful to take some time to reflect on what's changed and what you might need to feel more engaged again. What's one thing you used to enjoy that you haven't tried in a while?",
+        "response": "It can be really tough to feel like you've lost your spark and things that used to bring you joy no longer do. This can be a really challenging and isolating experience, but it's not uncommon. Sometimes, taking a break and giving yourself permission to just be can help you regain your footing. What's one thing you used to enjoy that you haven't tried in a while, and might be worth revisiting?",
         "confidence": 0.7945
       }
     ]
@@ -60,7 +60,7 @@
         "emotion_cluster": "ANXIETY",
         "trend": "INSUFFICIENT_DATA",
         "strategy": "GROUNDING",
-        "response": "It can be really overwhelming to feel anxious about an upcoming exam. Let's take a moment to breathe together - why don't you take a deep breath in, hold it for a second, and then slowly let it out? Sometimes, focusing on our breath can help calm our minds. What's the first thing that comes to mind when you think about what you're looking forward to doing after the exam is over?",
+        "response": "It can be really tough to feel anxious about something that's important to you. Let's take a deep breath together and see if we can find a calm moment in all this worry - why don't you take a moment to notice the things around you, like the sights and sounds in the room? Sometimes focusing on what's right in front of us can help us feel a bit more grounded. What's the first thing you notice when you look around you?",
         "confidence": 0.9936
       },
       {
@@ -68,7 +68,7 @@
         "emotion_cluster": "SADNESS",
         "trend": "INSUFFICIENT_DATA",
         "strategy": "VALIDATION",
-        "response": "It can be really tough to feel like you're carrying the weight of others' expectations on your shoulders. It sounds like the fear of disappointing others is adding to your sadness right now. I'm here to listen and support you, without judgment. What does \"disappointing everyone\" mean to you, and how is that feeling sitting with you today?",
+        "response": "It can be really tough to feel like you're carrying the weight of others' expectations on your shoulders. It sounds like the thought of disappointing others is feeling especially heavy for you right now. I'm here to listen and offer a supportive ear. What's the most difficult part of the idea of disappointing others for you?",
         "confidence": 0.3909
       },
       {
@@ -76,7 +76,7 @@
         "emotion_cluster": "ANXIETY",
         "trend": "FLUCTUATING",
         "strategy": "EXPLORATORY_INQUIRY",
-        "response": "It can be really frustrating when worries feel like they're stuck on repeat. I'm here to listen and try to understand what's going on for you. It sounds like this exam is weighing heavily on your mind, and it's hard to shake off the worrying thoughts. What's one specific aspect of the exam that's causing you the most worry right now?",
+        "response": "It can be really overwhelming when worries feel like they're spiraling out of control. I'm here to listen and offer a supportive ear, and I want you to know that you're not alone in this feeling. It takes a lot of courage to acknowledge and share your worries with someone. What's been the most persistent thought that's been running through your mind when you worry about your exam?",
         "confidence": 0.9177
       }
     ],
@@ -86,7 +86,7 @@
         "emotion_cluster": "ANXIETY",
         "trend": "INSUFFICIENT_DATA",
         "strategy": "STANDARD",
-        "response": "It's completely understandable to feel anxious about a big exam, and it sounds like you're putting a lot of pressure on yourself. I'm here to listen and offer support, and I want you to know that you're not alone in feeling this way. Many people get nervous before a big test, and it doesn't mean you're not prepared. What's been going through your mind when you think about the exam?",
+        "response": "It's completely normal to feel anxious before a big exam, and it sounds like you're feeling a bit overwhelmed right now. Would you like to talk a bit more about what's been going through your mind lately? Sometimes sharing your thoughts and feelings can help clarify things. What's been the most worrying part of the exam for you?",
         "confidence": 0.9936
       },
       {
@@ -94,7 +94,7 @@
         "emotion_cluster": "SADNESS",
         "trend": "INSUFFICIENT_DATA",
         "strategy": "STANDARD",
-        "response": "It can be really tough to feel like you're carrying the weight of others' expectations on your shoulders. Remember that it's okay to make mistakes and that you're not defined by one exam result. It might be helpful to think about what you would say to a friend in a similar situation - would you be kind and understanding, or critical and harsh? What would you need to hear from someone right now to feel a little more at ease?",
+        "response": "It can be really tough to feel like you're carrying the weight of others' expectations on your shoulders. Remember that it's okay to make mistakes and that people often care about you more than your grades. It might be helpful to think about what you would say to a friend in a similar situation. What would you need to hear from someone right now to feel a bit more at ease?",
         "confidence": 0.3909
       },
       {
@@ -102,7 +102,7 @@
         "emotion_cluster": "ANXIETY",
         "trend": "INSUFFICIENT_DATA",
         "strategy": "STANDARD",
-        "response": "It can be really overwhelming when worries feel like they're spinning out of control. Sometimes, taking a step back and focusing on the present moment can help calm things down. You're doing the best you can, and that's something to be proud of. What's one thing you could do right now to take care of yourself and feel a little more grounded?",
+        "response": "It can be really frustrating when worries feel like they're stuck on repeat. Sometimes, taking a step back and focusing on the present moment can help calm things down a bit. Would you like to explore some ways to help you feel more grounded in the here and now? What's one thing you've done in the past that's helped you feel more calm and centered?",
         "confidence": 0.9177
       }
     ]
@@ -114,7 +114,7 @@
         "emotion_cluster": "ANXIETY",
         "trend": "INSUFFICIENT_DATA",
         "strategy": "GROUNDING",
-        "response": "It's completely normal to feel a bit overwhelmed when starting something new. Let's take a deep breath together and focus on the present moment - why don't we take a look around you and notice 5 things that you can see right now? This can help calm your mind and bring you back to the here and now. What's the first thing you notice when you look around?",
+        "response": "I can sense how overwhelming this feeling of terror must be for you right now. It's completely normal to have some doubts when starting something new. Let's take a deep breath together and focus on the present moment - what are five things you can see around you right now that bring you a sense of calm? What's the first thing that catches your eye?",
         "confidence": 0.9933
       },
       {
@@ -122,7 +122,7 @@
         "emotion_cluster": "POSITIVE",
         "trend": "INSUFFICIENT_DATA",
         "strategy": "POSITIVE_REINFORCEMENT",
-        "response": "It's great that you're surrounded by supportive people who want the best for you. Their encouragement can be really uplifting, and it's wonderful that they're acknowledging your achievement. You must be feeling quite proud of yourself for getting the job, and that's something to celebrate. What is it about their support that's making you feel happy right now?",
+        "response": "It's great that the people around you are supportive and want to see you thrive. Their encouragement can be really uplifting, and it's lovely that they're acknowledging your achievement. You must be doing something right to have earned their praise, and that's definitely something to be proud of. What is it about their support that's making you feel happy and appreciated right now?",
         "confidence": 0.9502
       },
       {
@@ -130,7 +130,7 @@
         "emotion_cluster": "POSITIVE",
         "trend": "STABLE_POSITIVE",
         "strategy": "POSITIVE_REINFORCEMENT",
-        "response": "That's wonderful to hear, it's like a weight is lifting off your shoulders. You're rediscovering your own rhythm and energy, and that's something to be cherished. It's great that you're acknowledging and embracing this positive shift within yourself. What are some of the things that you're enjoying or looking forward to now that you're feeling more like yourself?",
+        "response": "That's wonderful to hear, it's like a weight is lifting off your shoulders. You're rediscovering your sense of self and it's a truly empowering feeling. What are some things that you're enjoying or looking forward to now that you're feeling more like yourself? What's the first thing you'd like to do to celebrate this newfound sense of normalcy?",
         "confidence": 0.7261
       }
     ],
@@ -140,7 +140,7 @@
         "emotion_cluster": "ANXIETY",
         "trend": "INSUFFICIENT_DATA",
         "strategy": "STANDARD",
-        "response": "That can be a really overwhelming feeling, especially when you've been working towards this goal for so long. It's normal to have some doubts and fears about your abilities. You've already achieved something amazing by getting the job, and that takes a lot of skill and dedication. What are some things that are worrying you the most about this new role?",
+        "response": "It's completely normal to feel that way, especially when starting something new. You've already accomplished so much by getting the job, and that's something to be proud of. It might help to focus on what you can control and take things one step at a time. What are some things that are making you feel most uncertain about your new role?",
         "confidence": 0.9933
       },
       {
@@ -148,7 +148,7 @@
         "emotion_cluster": "POSITIVE",
         "trend": "INSUFFICIENT_DATA",
         "strategy": "STANDARD",
-        "response": "It can be really tough when others don't quite understand why you're feeling a certain way, even if it's not what they expect. You might be feeling a mix of emotions, and that's okay - it's normal to have conflicting feelings, especially with something as significant as a new job. It's like there's a gap between what others think you should be feeling and what you're actually experiencing. What would you say is the most overwhelming emotion for you right now?",
+        "response": "It can be really tough when others expect us to feel a certain way, especially when our own emotions don't quite match up. You might be feeling a mix of emotions right now, and that's okay. It's like you're being pulled in different directions, with excitement about the new job on one hand, and fear of not meeting expectations on the other. What's one thing that you think would help you feel more at ease in your new role?",
         "confidence": 0.9502
       },
       {
@@ -156,7 +156,7 @@
         "emotion_cluster": "POSITIVE",
         "trend": "INSUFFICIENT_DATA",
         "strategy": "STANDARD",
-        "response": "It's wonderful to hear that you're regaining your sense of self and feeling more grounded. This can be a really empowering experience, especially after navigating uncertain emotions. What small steps have you taken recently that you think might be contributing to this positive shift? What does feeling like yourself again mean to you right now?",
+        "response": "That's wonderful to hear, it sounds like you're finding your footing and regaining your confidence. It's great that you're acknowledging and embracing this positive shift in your emotions. What do you think has contributed to you feeling more like yourself lately?",
         "confidence": 0.7261
       }
     ]

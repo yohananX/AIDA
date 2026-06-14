@@ -12,8 +12,9 @@ logger = logging.getLogger(__name__)
 
 
 class FeedbackStore:
-    def __init__(self):
+    def __init__(self, data_collector=None):
         self._ratings: dict[str, list[dict]] = defaultdict(list)
+        self.data_collector = data_collector
 
     def record(self, session_id: str, turn_number: int, empathy_rating: int,
                strategy: str = "", emotion_cluster: str = "", mode: str = "aeif") -> bool:
@@ -29,6 +30,8 @@ class FeedbackStore:
             "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         }
         self._ratings[session_id].append(entry)
+        if self.data_collector is not None:
+            self.data_collector.attach_rating(session_id, turn_number, empathy_rating)
         logger.info(f"Feedback recorded: session={session_id}, turn={turn_number}, rating={empathy_rating}")
         return True
 

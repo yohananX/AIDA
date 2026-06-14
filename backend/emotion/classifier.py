@@ -100,6 +100,8 @@ KEYWORD_CLUSTER_MAP = {
         "confused", "unsure", "surprised", "unexpected", "shocked", "curious",
         "uncertain", "mixed", "confusing", "can't believe",
         "e be like say", "but I", "should be happy",
+        "not sure", "don't know", "not certain", "hard to say",
+        "not really sure", "can't tell", "not clear",
     ],
 }
 
@@ -129,8 +131,12 @@ class EmotionClassifier:
     def classify(self, text: str) -> dict:
         if not text or not text.strip():
             return {"emotion_cluster": "NEUTRAL", "raw_emotion": "neutral", "confidence": 0.0}
+
+        if self._is_ambiguous_expression(text):
+            return {"emotion_cluster": "AMBIGUOUS", "raw_emotion": "ambiguous", "confidence": 0.65}
+
         hf_result = self._classify_hf(text)
-        if hf_result and hf_result["confidence"] >= 0.3:
+        if hf_result and hf_result["confidence"] >= 0.5:
             if self._check_ambiguity(text, hf_result):
                 return {"emotion_cluster": "AMBIGUOUS", "raw_emotion": "ambiguous", "confidence": 0.6}
             return hf_result
@@ -139,9 +145,24 @@ class EmotionClassifier:
             if self._check_ambiguity(text, keyword_result):
                 return {"emotion_cluster": "AMBIGUOUS", "raw_emotion": "ambiguous", "confidence": 0.6}
             return keyword_result
-        if hf_result:
+        if hf_result and hf_result["confidence"] >= 0.3:
             return hf_result
+        if keyword_result:
+            return keyword_result
         return {"emotion_cluster": "NEUTRAL", "raw_emotion": "neutral", "confidence": 0.0}
+
+    def _is_ambiguous_expression(self, text: str) -> bool:
+        text_lower = text.lower().strip()
+        ambiguous_patterns = [
+            r"not\s*sure", r"don't\s*know", r"can't\s*tell",
+            r"not\s*certain", r"hard\s*to\s*say", r"not\s*clear",
+            r"can't\s*really\s*say", r"not\s*really\s*sure",
+            r"uncertain", r"confused", r"confusing", r"confusion",
+        ]
+        for pattern in ambiguous_patterns:
+            if re.search(pattern, text_lower):
+                return True
+        return False
 
     def _check_ambiguity(self, text: str, classification: dict) -> bool:
         text_lower = text.lower()
@@ -154,6 +175,8 @@ class EmotionClassifier:
             "should be happy but", "don't care", "don't deserve",
             "could be worse", "i guess", "pretending",
             "inside i felt nothing", "don't feel it",
+            "not sure how i feel", "not sure how i'm feeling",
+            "don't know how i feel", "can't tell how i feel",
         ]
         for phrase in ambiguous_phrases:
             if phrase in text_lower:

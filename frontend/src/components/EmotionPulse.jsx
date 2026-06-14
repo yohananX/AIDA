@@ -1,32 +1,24 @@
 import React from 'react';
 
 const PULSE_COLORS = {
-  POSITIVE: { bg: 'rgba(93, 173, 122, 0.08)', glow: 'rgba(93, 173, 122, 0.15)' },
-  SADNESS: { bg: 'rgba(70, 130, 180, 0.08)', glow: 'rgba(70, 130, 180, 0.15)' },
-  ANXIETY: { bg: 'rgba(200, 150, 60, 0.08)', glow: 'rgba(200, 150, 60, 0.15)' },
-  ANGER: { bg: 'rgba(180, 70, 70, 0.08)', glow: 'rgba(180, 70, 70, 0.15)' },
-  NEUTRAL: { bg: 'rgba(90, 100, 112, 0.05)', glow: 'rgba(90, 100, 112, 0.08)' },
-  AMBIGUOUS: { bg: 'rgba(120, 100, 160, 0.08)', glow: 'rgba(120, 100, 160, 0.15)' },
-  CRISIS: { bg: 'rgba(180, 50, 50, 0.12)', glow: 'rgba(180, 50, 50, 0.2)' },
+  POSITIVE: 'rgba(78, 222, 163, 0.12)',
+  SADNESS: 'rgba(124, 185, 232, 0.12)',
+  ANXIETY: 'rgba(255, 184, 105, 0.12)',
+  ANGER: 'rgba(255, 138, 128, 0.12)',
+  NEUTRAL: 'rgba(158, 148, 168, 0.08)',
+  AMBIGUOUS: 'rgba(200, 184, 255, 0.12)',
+  CRISIS: 'rgba(255, 123, 123, 0.18)',
 };
 
 export default function EmotionPulse({ emotionCluster }) {
-  const colors = PULSE_COLORS[emotionCluster] || PULSE_COLORS.NEUTRAL;
+  const glow = PULSE_COLORS[emotionCluster] || PULSE_COLORS.NEUTRAL;
   return (
     <div
-      className="emotion-pulse"
+      className="fixed top-[-10%] left-[-10%] w-[60%] h-[60%] pointer-events-none z-0"
       style={{
-        background: `radial-gradient(ellipse at 50% 0%, ${colors.glow} 0%, transparent 70%)`,
+        background: `radial-gradient(circle, ${glow} 0%, rgba(21, 18, 27, 0) 70%)`,
         transition: 'background 0.8s ease',
       }}
-    >
-      <div
-        className="pulse-ring"
-        style={{
-          background: colors.bg,
-          boxShadow: `0 0 60px ${colors.glow}`,
-        }}
-      />
-    </div>
+    />
   );
 }

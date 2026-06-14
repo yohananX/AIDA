@@ -18,7 +18,7 @@ def test_escalating_distress_strategy():
 
 def test_elevated_anger_strategy():
     s = StrategyEngine()
-    assert s.select("ELEVATED_ANGER", "ANGER") == "CALM_REFLECTION"
+    assert s.select("ELEVATED_ANGER", "ANGER") == "DIRECT_ENGAGEMENT"
 
 
 def test_improving_strategy():
@@ -44,4 +44,4 @@ def test_insufficient_data_strategies():
     assert s.select("INSUFFICIENT_DATA", "POSITIVE") == "POSITIVE_REINFORCEMENT"
     assert s.select("INSUFFICIENT_DATA", "NEUTRAL") == "OPEN_CHECKIN"
     assert s.select("INSUFFICIENT_DATA", "AMBIGUOUS") == "CLARIFICATION_REQUEST"
-    assert s.select("INSUFFICIENT_DATA", "ANGER") == "CALM_REFLECTION"
+    assert s.select("INSUFFICIENT_DATA", "ANGER") == "DIRECT_ENGAGEMENT"

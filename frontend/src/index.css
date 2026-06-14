@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #15121b;
+  color: #e7e0ed;
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+.glass-card {
+  background: rgba(33, 30, 39, 0.4);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.aura-primary {
+  background: radial-gradient(circle, rgba(160, 120, 255, 0.15) 0%, rgba(21, 18, 27, 0) 70%);
+}
+
+.aura-secondary {
+  background: radial-gradient(circle, rgba(78, 222, 163, 0.1) 0%, rgba(21, 18, 27, 0) 70%);
+}
+
+.emotion-pulse {
+  animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-6px); }
+}
+
+.springy-bubble {
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.springy-bubble:hover {
+  transform: scale(1.02);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(149, 142, 160, 0.2);
+  border-radius: 10px;
+}
+
+.aura-glow {
+  filter: blur(80px);
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.pulse-orb {
+  animation: breathe 6s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.15); opacity: 0.8; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.glass-panel {
+  background: rgba(21, 18, 27, 0.4);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.emotion-aura {
+  background: radial-gradient(circle at center, #8B5CF6 0%, transparent 70%);
+}
+
+.pulse-animation {
+  animation: auraPulse 8s ease-in-out infinite;
+}
+
+@keyframes auraPulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; filter: blur(60px); }
+  50% { transform: scale(1.2); opacity: 0.8; filter: blur(80px); }
+}
+
+.message-in {
+  animation: slideUpMsg 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes slideUpMsg {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.scroll-hide::-webkit-scrollbar { display: none; }
+.scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+.drawer-transition {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}

@@ -17,9 +17,14 @@ export default function StrategyBadge({ strategy }) {
   if (!strategy || strategy === 'CRISIS_INTERVENTION') return null;
   const label = STRATEGY_LABELS[strategy] || strategy;
   return (
-    <div className="strategy-badge">
-      <span className="strategy-dot" />
-      {label}
+    <div className="glass-card rounded-lg p-stack-md flex flex-col gap-stack-md">
+      <h3 className="text-label-caps text-on-surface-variant uppercase">Active Approach</h3>
+      <div className="flex flex-wrap gap-2">
+        <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-secondary/10 border border-secondary/30 text-secondary text-[11px] font-semibold">
+          <span className="material-symbols-outlined text-[14px]">psychology</span>
+          {label}
+        </div>
+      </div>
     </div>
   );
 }

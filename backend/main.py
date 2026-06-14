@@ -4,6 +4,7 @@ Registers all routes: /chat, /health, /session, /feedback
 """
 
 import os
+import json
 import logging
 from dotenv import load_dotenv
 
@@ -11,6 +12,7 @@ load_dotenv()
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, Field
 
 from pipeline import AEIFPipeline
@@ -60,6 +62,8 @@ async def health():
     return {
         "status": "ok",
         "model_loaded": pipeline.emotion_classifier.pipeline is not None,
+        "gemini_available": pipeline.gemini_client.available(),
+        "groq_available": pipeline.groq_client.available(),
     }
 
 
@@ -117,4 +121,75 @@ async def export_session(session_id: str):
 
     ratings = pipeline.feedback_store.get_session_ratings(session_id)
     result["feedback"] = ratings
+
+    low_confidence_turns = []
+    user_idx = 0
+    for msg in pipeline.session_store.get_history(session_id):
+        if msg.get("role") == "user":
+            user_idx += 1
+            if msg.get("low_confidence"):
+                low_confidence_turns.append(user_idx)
+
+    result["low_confidence_turns"] = low_confidence_turns
+    result["low_confidence_count"] = len(low_confidence_turns)
     return result
+
+
+@app.get("/data/low-confidence")
+async def get_low_confidence():
+    records = pipeline.data_collector.get_all()
+    return {"total": len(records), "records": records}
+
+
+@app.get("/data/low-confidence/rated")
+async def get_low_confidence_rated():
+    records = pipeline.data_collector.get_rated()
+    return {"total": len(records), "records": records}
+
+
+@app.get("/data/low-confidence/export")
+async def export_low_confidence():
+    jsonl = pipeline.data_collector.export_jsonl()
+    return PlainTextResponse(
+        content=jsonl,
+        media_type="application/x-ndjson",
+        headers={"Content-Disposition": 'attachment; filename="aida_lowconf_dataset.jsonl"'},
+    )
+
+
+class ConsentRequest(BaseModel):
+    session_id: str
+
+
+@app.post("/data/consent")
+async def consent(req: ConsentRequest):
+    records = pipeline.data_collector.mark_consented(req.session_id)
+    os.makedirs(os.path.join("data", "collected"), exist_ok=True)
+    filepath = os.path.join("data", "collected", "consented_turns.jsonl")
+    with open(filepath, "a") as f:
+        for record in records:
+            f.write(json.dumps(record) + "\n")
+    return {"saved": len(records)}
+
+
+class AnnotationRequest(BaseModel):
+    correct_emotion_guess: str = None
+    notes: str = None
+
+
+@app.patch("/data/low-confidence/{record_id}")
+async def update_annotation(record_id: str, req: AnnotationRequest):
+    updated = pipeline.data_collector.update_annotation(
+        record_id,
+        correct_emotion_guess=req.correct_emotion_guess,
+        notes=req.notes,
+    )
+    if not updated:
+        raise HTTPException(status_code=404, detail="Record not found")
+    return {"updated": True}
+
+
+@app.delete("/data/low-confidence")
+async def clear_low_confidence():
+    pipeline.data_collector.clear()
+    return {"cleared": True}
