@@ -12,7 +12,7 @@ load_dotenv()
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import PlainTextResponse, JSONResponse
 from pydantic import BaseModel, Field
 
 from pipeline import AEIFPipeline
@@ -193,3 +193,13 @@ async def update_annotation(record_id: str, req: AnnotationRequest):
 async def clear_low_confidence():
     pipeline.data_collector.clear()
     return {"cleared": True}
+
+
+@app.get("/test-data")
+async def get_test_data():
+    data_path = os.path.join(os.path.dirname(__file__), "..", "data", "test_conversations.json")
+    if not os.path.exists(data_path):
+        return {"error": "Test data file not found"}
+    with open(data_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    return JSONResponse(content=data)

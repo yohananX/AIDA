@@ -29,14 +29,14 @@ logger = logging.getLogger(__name__)
 
 LOW_CONFIDENCE_THRESHOLD = 0.55
 
-CRISIS_RESPONSE = """I hear that you're carrying something very heavy right now, and I'm glad you reached out.
+CRISIS_RESPONSE = """I hear you, and I'm really glad you said something. What you're feeling right now matters, and you don't have to sit with it by yourself.
 
-Please speak to someone who can truly be there for you:
+Please reach out to someone who can be there with you through this:
 - Mentally Aware Nigeria Initiative (MANI): 08091116264
 - Lagos State Emergency Line: 08000432584
 - National Emergency Services: 112
 
-You do not have to face this alone. 💙"""
+Would you be willing to call one of those numbers with me? You are not alone in this. 💙"""
 
 TEMPLATE_FALLBACKS = {
     "VALIDATION_AND_REFLECTION": "That's really heavy. I'm here with you in it.",

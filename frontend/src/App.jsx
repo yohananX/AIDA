@@ -6,6 +6,7 @@ import StrategyBadge from './components/StrategyBadge.jsx';
 import FeedbackStars from './components/FeedbackStars.jsx';
 import SessionSummary from './components/SessionSummary.jsx';
 import ResearcherView from './components/ResearcherView.jsx';
+import EvaluationDashboard from './components/EvaluationDashboard.jsx';
 import { sendMessage, clearSession, getSession } from './api/aida.js';
 
 const CLUSTER_META = {
@@ -167,6 +168,10 @@ export default function App() {
 
   if (window.location.hash === '#researcher') {
     return <ResearcherView />;
+  }
+
+  if (window.location.hash === '#evaluation') {
+    return <EvaluationDashboard />;
   }
 
   if (!accepted) {

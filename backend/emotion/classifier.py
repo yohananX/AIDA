@@ -90,6 +90,8 @@ KEYWORD_CLUSTER_MAP = {
         "nervous", "panic", "terrified", "dread", "uneasy", "restless",
         "overwhelm", "stress", "disappoint everyone", "what if",
         "my mind dey scatter", "I no fit sleep", "wawu",
+        "heart racing", "racing heart", "chest tight", "can't breathe",
+        "short of breath", "heavy chest", "pounding heart",
     ],
     "ANGER": [
         "angry", "annoyed", "furious", "mad", "frustrated", "rage", "irritated",
@@ -139,16 +141,16 @@ class EmotionClassifier:
         if hf_result and hf_result["confidence"] >= 0.5:
             if self._check_ambiguity(text, hf_result):
                 return {"emotion_cluster": "AMBIGUOUS", "raw_emotion": "ambiguous", "confidence": 0.6}
-            return hf_result
+            return self._sanity_check(text, hf_result)
         keyword_result = self._classify_keywords(text)
         if keyword_result and keyword_result["confidence"] >= 0.5:
             if self._check_ambiguity(text, keyword_result):
                 return {"emotion_cluster": "AMBIGUOUS", "raw_emotion": "ambiguous", "confidence": 0.6}
-            return keyword_result
+            return self._sanity_check(text, keyword_result)
         if hf_result and hf_result["confidence"] >= 0.3:
-            return hf_result
+            return self._sanity_check(text, hf_result)
         if keyword_result:
-            return keyword_result
+            return self._sanity_check(text, keyword_result)
         return {"emotion_cluster": "NEUTRAL", "raw_emotion": "neutral", "confidence": 0.0}
 
     def _is_ambiguous_expression(self, text: str) -> bool:
@@ -161,8 +163,65 @@ class EmotionClassifier:
         ]
         for pattern in ambiguous_patterns:
             if re.search(pattern, text_lower):
+                if self._has_emotional_content(text):
+                    return False
                 return True
         return False
+
+    def _has_emotional_content(self, text: str) -> bool:
+        text_lower = text.lower()
+        for cluster, patterns in KEYWORD_CLUSTER_MAP.items():
+            if cluster == "AMBIGUOUS":
+                continue
+            for p in patterns:
+                if p.search(text_lower):
+                    return True
+        for word in POSITIVE_WORDS_SET:
+            if word in text_lower:
+                return True
+        for word in NEGATIVE_WORDS_SET:
+            if word in text_lower:
+                return True
+        return False
+
+    def _is_negated_match(self, text: str, match_start: int) -> bool:
+        before = text[:match_start].rstrip()
+        last_words = before.split()[-4:] if before.split() else []
+        negations = {"not", "don't", "dont", "never", "no"}
+        for i, word in enumerate(last_words):
+            clean = word.lower().strip(".,!?;:")
+            if clean in negations or clean.endswith("n't"):
+                if len(last_words) - i - 1 <= 2:
+                    return True
+        return False
+
+    def _sanity_check(self, text: str, result: dict) -> dict:
+        if result["emotion_cluster"] == "NEUTRAL":
+            return result
+
+        if not self._has_emotional_content(text) and not self._is_ambiguous_expression(text):
+            text_lower = text.lower()
+            ambiguous_keywords = KEYWORD_CLUSTER_MAP.get("AMBIGUOUS", [])
+            has_ambiguous = any(p.search(text_lower) for p in ambiguous_keywords)
+            if not has_ambiguous:
+                return {"emotion_cluster": "NEUTRAL", "raw_emotion": "neutral", "confidence": 0.5}
+
+        if result["emotion_cluster"] in ("ANXIETY", "SADNESS", "ANGER") and result["confidence"] < 0.95:
+            cluster_keywords = KEYWORD_CLUSTER_MAP.get(result["emotion_cluster"], [])
+            any_match_found = False
+            all_negated = True
+            for p in cluster_keywords:
+                for match in p.finditer(text):
+                    any_match_found = True
+                    if not self._is_negated_match(text, match.start()):
+                        all_negated = False
+                        break
+                if not all_negated:
+                    break
+            if any_match_found and all_negated:
+                return {"emotion_cluster": "NEUTRAL", "raw_emotion": "neutral", "confidence": 0.5}
+
+        return result
 
     def _check_ambiguity(self, text: str, classification: dict) -> bool:
         text_lower = text.lower()
@@ -206,7 +265,12 @@ class EmotionClassifier:
     def _classify_keywords(self, text: str) -> dict | None:
         scores = {}
         for cluster, patterns in KEYWORD_CLUSTER_MAP.items():
-            count = sum(1 for p in patterns if p.search(text))
+            count = 0
+            for p in patterns:
+                for match in p.finditer(text):
+                    if cluster in ("ANXIETY", "SADNESS", "ANGER") and self._is_negated_match(text, match.start()):
+                        continue
+                    count += 1
             if count > 0:
                 scores[cluster] = count
         if not scores:
